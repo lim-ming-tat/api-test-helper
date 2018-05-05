@@ -1,0 +1,15 @@
+{
+  "name": "api-test-helper",
+  "version": "1.0.0",
+  "description": "Helper Library to test API",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "node-apex-api-security": "github:GovTechSG/node-apex-api-security",
+    "node-jose": "^0.11.0"
+  }
+}

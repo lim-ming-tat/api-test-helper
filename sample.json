@@ -1,0 +1,81 @@
+[
+    {
+        "id" : "1",
+        "description" : "Gateway Security Parameter (L2) Template.",
+
+        "authPrefix": "apex_l2_eg",
+        "realm" : "http://node.js.test.l2.eg",
+        "appId" : "playground-4L5mrKdV6QQ8xhg9gxE9Ou92",
+        "secret" : null,
+        "invokeUrl" : "https://playground.api.gov.sg:443/api/v1/rest/level2/ex-ex",
+        "signatureUrl" : "https://playground.e.api.gov.sg:443/api/v1/rest/level2/ex-ex",
+        "httpHeaders" : null,
+        "httpMethod" : "GET",
+        "queryString" : { "clientname" : "node.js.test.l2", "data" : "some data value" },
+        "formData" :  null ,
+
+        "signatureMethod" : null,
+        "nonce" : null,
+        "timestamp" : null,
+        "signature" : null,
+
+        "_privateCertFileName" : "Support private key in pem format for JWE and L2.",
+        "privateCertFileName" : "/Users/mingtat.lim/SourceTree/jmeter-scripts/sgcore/alpha.apex.gov.sg.nopass.pem",
+        "privateCertFileType" : "pem",
+
+        "_publicCertFileName" : "Support public key in pem & der format for JWS.",
+        "publicCertFileName" : "/Users/mingtat.lim/SourceTree/jmeter-scripts/sgcore/beta.apex.gov.sg.cer",
+        "publicCertFileType" : "pem",
+    
+        "negativeTest" : false,
+        "debug" : false,
+
+        "ignoreServerCert" : false,
+        "caCertFileName" : "certProd/COMODO_RSA_Certification_Authority.public.pem",
+        "caCertFileType" : "pem"
+    },
+    {
+        "id" : "2",
+        "description" : "Gateway Security Parameter (L0) Template. External URL Test.",
+
+        "authPrefix": null,
+        "realm" : null,
+        "appId" : null,
+        "secret" : null,
+        "invokeUrl" : "http://www.example.com/",
+        "signatureUrl" : null,
+        "httpHeaders" : null,
+        "httpMethod" : "GET",
+        "queryString" : null,
+        "formData" :  null ,
+
+        "signatureMethod" : null,
+        "nonce" : null,
+        "timestamp" : null,
+        "signature" : null,
+        "certFileName" : null,
+        "certFileType" : null,
+
+        "negativeTest" : false,
+        "debug" : false,
+
+        "ignoreServerCert" : true,
+        "caFileName" : null
+    },
+    {
+        "id" : "3",
+        "description" : "Parameter Template. Minimum properties test.",
+
+        "invokeUrl" : "http://www.example.com/",
+        "httpMethod" : "GET"
+    },
+    {
+        "id" : "4",
+        "description" : "Parameter Template. Debug on test.",
+
+        "invokeUrl" : "http://www.example.com/",
+        "httpMethod" : "GET",
+
+        "debug" : false
+    }
+]
