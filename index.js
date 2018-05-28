@@ -339,8 +339,14 @@ util.performTestGatewaySecurity = (param, verifyFunction) => {
         if (debug) console.log("\nURL:::");
         if (debug) console.log(param.invokeUrl);
 
-        if (verifyFunction != undefined) {
-            return verifyFunction(param, res);
+        if (verifyFunction != undefined || param.verifyFunction != undefined) {
+            if (verifyFunction != undefined || param.verifyFunction != undefined) {
+                // execute verification function from parameters
+                util[param.verifyFunction](param, res);
+            } else {
+                // execute verification function from call
+                return verifyFunction(param, res);
+            }
         } else {
             // test pass
             passedTest++;

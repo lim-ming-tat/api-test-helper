@@ -77,5 +77,45 @@
         "httpMethod" : "GET",
 
         "debug" : false
+    },
+    {
+        "id" : "JOSE.jws",
+        "description" : "Parameter Template. JWS.",
+        "apiName" : "Helljoseoworld REST JOSE",
+    
+        "invokeUrl" : "https://playground.api.gov.sg:443/api/v1/rest/jose/ex-ex",
+        "httpMethod" : "GET",
+    
+        "httpHeaders" : { "Accept" : "application/jose+jws" },
+    
+        "publicCertFileName" : "/Users/mingtat.lim/SourceTree/jmeter-scripts/sgcore/xray.apex.gov.sg.cer",
+        "publicCertFileType" : "pem",
+    
+        "verifyFunction" : "myVerifyJws",
+    
+        "debug" : false
+    },
+    {
+        "id" : "JOSE.jwe",
+        "description" : "Parameter Template. JWE.",
+        "apiName" : "Helljoseoworld REST JOSE",
+
+        "authPrefix": "apex_l2_eg",
+        "realm" : "http://node.js.test.l2.eg",
+        "appId" : "playground-4L5mrKdV6QQ8xhg9gxE9Ou92",
+        "secret" : null,
+        "invokeUrl" : "https://playground.api.gov.sg:443/api/v1/rest/jose/ex-ex",
+        "signatureUrl" : "https://playground.e.api.gov.sg:443/api/v1/rest/jwe/ex-ex/",
+        "httpHeaders" : { "Accept" : "application/jose+jwe" },
+        "httpMethod" : "GET",
+        "queryString" : { "clientname" : "node.js.test.l2", "data" : "some data value" },
+        "formData" :  null ,
+
+        "privateCertFileName" : "/Users/mingtat.lim/SourceTree/jmeter-scripts/sgcore/alpha.apex.gov.sg.nopass.pem",
+        "privateCertFileType" : "pem",
+
+        "verifyFunction" : "myVerifyJwe",
+
+        "debug" : false
     }
 ]
