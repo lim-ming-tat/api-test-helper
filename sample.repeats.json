@@ -1,0 +1,48 @@
+[{
+        "id": "JOSE.jwe",
+        "description": "Parameter Template. JWE.",
+        "apiName": "Helljoseoworld REST JOSE",
+
+        "authPrefix": "apex_l2_eg",
+        "realm": "http://node.js.test.l2.eg",
+        "appId": "playground-4L5mrKdV6QQ8xhg9gxE9Ou92",
+        "secret": null,
+        "invokeUrl": "https://playground.api.gov.sg:443/api/v1/rest/jose/ex-ex",
+        "signatureUrl": "https://playground.e.api.gov.sg:443/api/v1/rest/jwe/ex-ex/",
+        "httpHeaders": {
+            "Accept": "application/jose+jwe"
+        },
+        "httpMethod": "GET",
+        "queryString": {
+            "clientname": "node.js.test.repeats"
+        },
+        "formData": null,
+
+        "privateCertFileName": "/Users/mingtat.lim/SourceTree/jmeter-scripts/sgcore/alpha.apex.gov.sg.nopass.pem",
+        "privateCertFileType": "pem",
+
+        "verifyFunction": "myVerifyJwe",
+
+        "repeats": 3,
+
+        "debug": false
+    },
+    {
+        "id": "4",
+        "description": "Parameter Template. Debug on test.",
+
+        "invokeUrl": "http://www.example.com/api",
+        "httpMethod": "GET",
+
+        "debug": false
+    },
+    {
+        "id": "5",
+        "description": "Parameter Template. Debug on test.",
+
+        "invokeUrl": "http://www.example.com",
+        "httpMethod": "GET",
+
+        "debug": false
+    }
+]

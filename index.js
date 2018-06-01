@@ -79,11 +79,39 @@ util.performTest = (params, verifyFunction) => {
     var newParams = [];
 
     if (Array.isArray(params)){
-        // clone the parameyer array, may not work if consists of object reference
+        // clone the parameter array, may not work if consists of object reference
         var cloneParams = JSON.parse(JSON.stringify(params));
 
+        // split the array to first item and the rest of the array
         item = cloneParams.splice(0,1)[0];
         newParams = cloneParams.splice(0);
+    }
+
+    // Implement repeats call for parameter with repeats attribute
+    if (item.repeats != undefined && item.repeats > 1){
+        var repeats = item.repeats - 2;
+        item.repeats = undefined;
+
+        // assign uuid to first item
+        if (item.queryString == undefined) item.queryString = {};
+
+        var stringCopy = JSON.stringify(item);
+
+        item.queryString.uuid = require('uuid/v1')();
+        item.description += " uuid=" + item.queryString.uuid;
+
+        var repeatedParam = "";
+        if (repeats == 0) {
+            // repeats 2 times, so just add 1 item
+            repeatedParam = JSON.parse('[' + stringCopy + ']');
+        } else {
+            repeatedParam = JSON.parse('[' + (stringCopy + ',').repeat(repeats) + stringCopy + ']');
+        }
+
+        // assign uuid to the rest
+        _.forEach(repeatedParam, function(param) { param.queryString.uuid = require('uuid/v1')(); param.description += " uuid=" + param.queryString.uuid; });
+
+        newParams = _.concat(repeatedParam, newParams);
     }
 
     var tangentialPromiseBranch = testFunction(item, verifyFunction).then(
@@ -364,7 +392,11 @@ util.performTestGatewaySecurity = (param, verifyFunction) => {
 
             console.log(">>> " + param.id + ". " + param.description + " <<< - Negative Test Success. " + error);
         } else {
+            console.log();
             console.log(">>> " + param.id + ". " + param.description + " <<< - Failed. " + error);
+            //console.log(">>> " + "URL: " + param.invokeUrl);
+            console.log(">>> " + "Param: " + JSON.stringify(param));
+            console.log();
         }
     });    
 }
