@@ -31,7 +31,7 @@
         "debug" : false,
 
         "ignoreServerCert" : false,
-        "caCertFileName" : "certProd/COMODO_RSA_Certification_Authority.public.pem",
+        "caCertFileName" : "../certProd/COMODO_RSA_Certification_Authority.public.pem",
         "caCertFileType" : "pem"
     },
     {
@@ -116,7 +116,7 @@
 
         "verifyFunction" : "myVerifyJwe",
 
-        "repeats": 5,
+        "repeats": 3,
         
         "debug" : false
     }

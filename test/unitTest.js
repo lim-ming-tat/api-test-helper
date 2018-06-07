@@ -1,6 +1,6 @@
 "use strict" 
 
-const helper = require('./index').apiHelper;
+const helper = require('./../index').apiHelper;
 
 let params = require('./sample.json');
 //let params = require('./sample.repeats.json');
