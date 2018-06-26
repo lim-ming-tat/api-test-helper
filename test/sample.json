@@ -74,9 +74,7 @@
         "description" : "Parameter Template. Debug on test.",
 
         "invokeUrl" : "http://www.example.com/",
-        "httpMethod" : "GET",
-
-        "debug" : false
+        "httpMethod" : "GET"
     },
     {
         "id" : "JOSE.jws",
@@ -116,7 +114,7 @@
 
         "verifyFunction" : "myVerifyJwe",
 
-        "repeats": 3,
+        "repeats": 5,
         
         "debug" : false
     }

@@ -11,6 +11,7 @@ const { URL } = require('url');
 const _ = require("lodash");
 
 const apex = require('node-apex-api-security').ApiSigningUtil;
+const dateFormat = require('./timestamp').dateFormat;
 
 var _debug = false;
 
@@ -164,9 +165,6 @@ util.verifyJws = (param, response) => {
             return jose.JWS.createVerify(jwsKey)
                 .verify(data)
                 .then(function(result) {
-                    // test pass
-                    passedTest++;
-
                     if (debug) console.log("\n");
                     if (debug) console.log("Data:::");
                     if (debug) console.log(result.payload.toString());
@@ -175,7 +173,10 @@ util.verifyJws = (param, response) => {
                     if (debug) console.log("JWS Verification Success...");
 
                     if (debug) console.log("\n");
-                    console.log(">>> " + param.id + ". " + param.description + " <<< - Success.");
+                    if(!param.suppressMessage) console.log(">>> " + param.id + ". " + param.description + " <<< - Success.");
+
+                    // test pass
+                    return true;
                 })
                 .catch(function(error) { 
                     //if (debug) console.log("\n>>> " + param.id + " <<<\n");
@@ -184,11 +185,17 @@ util.verifyJws = (param, response) => {
                     if (debug) console.log("\n");
 
                     if (param.negativeTest){
-                        passedTest++;
+                        //passedTest++;
 
-                        console.log(">>> " + param.id + ". " + param.description + " <<< - Negative Test Success. " + error);
+                        if(!param.suppressMessage) console.log(">>> " + param.id + ". " + param.description + " <<< - Negative Test Success. " + error);
+
+                        // test pass
+                        return true;
                     } else {
                         console.log(">>> " + param.id + ". " + param.description + " <<< - Failed. " + error);
+
+                        // test failed
+                        return false;
                     }
                 });
         });
@@ -233,7 +240,7 @@ util.verifyJwe = (param, response) => {
                 .decrypt(data)
                 .then(function(result) {
                     // test pass
-                    passedTest++;
+                    //passedTest++;
 
                     if (debug) console.log("\n");
                     if (debug) console.log("Decrypted Data:");
@@ -243,7 +250,10 @@ util.verifyJwe = (param, response) => {
                     if (debug) console.log("JWE Verification Success...");
 
                     if (debug) console.log("\n");
-                    console.log(">>> " + param.id + ". " + param.description + " <<< - Success.");
+                    if(!param.suppressMessage) console.log(">>> " + param.id + ". " + param.description + " <<< - Success.");
+
+                    // test pass
+                    return true;
                 })
                 .catch(function(error) { 
                     //if (debug) console.log("\n>>> " + param.id + " <<<\n");
@@ -252,18 +262,55 @@ util.verifyJwe = (param, response) => {
                     
                     if (debug) console.log("\n");
                     if (param.negativeTest){
-                        passedTest++;
+                        //passedTest++;
 
-                        console.log(">>> " + param.id + ". " + param.description + " <<< - Negative Test Success. " + error);
+                        if(!param.suppressMessage) console.log(">>> " + param.id + ". " + param.description + " <<< - Negative Test Success. " + error);
+
+                        // test pass
+                        return true;
                     } else {
                         console.log(">>> " + param.id + ". " + param.description + " <<< - Failed. " + error);
+
+                        // test failed
+                        return false;
                     }
                 });
         });
 }
 
 util.displayTestResult = () => {
-    return Promise.resolve("Test Results::: " + passedTest + "/" + totalTest + "\n");
+    return Promise.resolve("Test Results::: " + passedTest + "/" + totalTest);
+}
+
+var startDate;
+util.startTestTimer = () => {
+    startDate = new Date();
+    return Promise.resolve();
+}
+
+util.displayElapseTime = () => {
+    if (startDate == undefined) return Promise.resolve("Start timer not started!");
+
+    var ts = startDate.timespan();
+
+    var message = "";
+    //message += "\n"; // console.log();
+    //console.log("Start Time " + startDate.format(dateFormat.masks.sgDateTime));
+    message += " Start Time: " + startDate.format() + "\n";
+    message += "   End Time: " + ts.endDate.format() + "\n";
+
+    if ((ts.totalSeconds()|0) == 0) {
+        message += "Elapse Time: " + ts.milliseconds + " milliseconds";
+    } else if ((ts.totalMinutes()|0) == 0) {
+        message += "Elapse Time: " + ts.seconds + " seconds " + ts.milliseconds + " milliseconds";
+    } else if ((ts.totalHours()|0) == 0) {
+        message += "Elapse Time: " + ts.minutes + " minutes " + ts.seconds + " seconds " + ts.milliseconds + " milliseconds";
+    } else {
+        message += "Elapse Time: " + (ts.totalHours()|0) + " hours " + ts.minutes + " minutes " + ts.seconds + " seconds " + ts.milliseconds + " milliseconds";
+    }
+    //message += "\n"; // console.log();
+
+    return Promise.resolve(message);
 }
 
 function showBaseString(param) {
@@ -336,7 +383,25 @@ util.getApexSecurityToken = (param) => {
     if (param.debug && param.signature != undefined) console.log('\nSignature::: \n' + param.signature);    
 }
 
+var defaultParam = undefined;
+util.setDefaultParam = (defaultValue) => {
+    defaultParam = defaultValue;
+}
+
+// TODO: to support more default properties...
+function propergateDefaultParam(param) {
+    if (defaultParam == undefined) return;
+
+    if (param.suppressMessage == undefined && defaultParam.suppressMessage != undefined) param.suppressMessage = defaultParam.suppressMessage;
+    if (param.debug == undefined && defaultParam.debug != undefined) param.debug = defaultParam.debug;
+    
+    return;
+}
+
 util.performTestGatewaySecurity = (param, verifyFunction) => {
+    // propagate default params
+    propergateDefaultParam(param);
+
     // test count
     totalTest += 1;
 
@@ -368,19 +433,19 @@ util.performTestGatewaySecurity = (param, verifyFunction) => {
         if (debug) console.log(param.invokeUrl);
 
         if (verifyFunction != undefined || param.verifyFunction != undefined) {
-            if (verifyFunction != undefined || param.verifyFunction != undefined) {
+            if (param.verifyFunction != undefined) {
                 // execute verification function from parameters
-                util[param.verifyFunction](param, res);
+                util[param.verifyFunction](param, res).then(verifyResult => { if (verifyResult) passedTest++; });
             } else {
                 // execute verification function from call
-                return verifyFunction(param, res);
+                verifyFunction(param, res).then(verifyResult => { if (verifyResult) passedTest++; });
             }
         } else {
             // test pass
             passedTest++;
 
             if (debug) console.log("\n");
-            console.log(">>> " + param.id + ". " + param.description + " <<< - Success.");
+            if(!param.suppressMessage) console.log(">>> " + param.id + ". " + param.description + " <<< - Success.");
         }
     }).catch(function(error) { 
         if (debug) console.log("\n");
