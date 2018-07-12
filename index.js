@@ -1,6 +1,6 @@
 "use strict" 
 
-const nonceLib = require('nonce')();
+const crypto = require('crypto');
 const request = require('superagent');
 const fs = require('fs');
 const jose = require('node-jose');
@@ -19,6 +19,10 @@ var totalTest = 0;
 var passedTest = 0;
 
 let util = {};
+
+function nonceLib() {
+    return crypto.randomBytes(32).toString('base64');
+}
 
 util.invokeRequest = (param) => {
     return new promise(function(resolve, reject){
