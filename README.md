@@ -119,3 +119,57 @@ Test Results::: 2/2
     "ignoreServerCert" : true
 }
 ```
+10. L21 Parameters Example
+```text
+{
+    "id" : "L2",
+    "description" : "Gateway Security Parameter (L2) Template.",
+
+    "authPrefix": "apex_l2_eg",
+    "realm" : "http://example.api.gov.sg",
+    "appId" : "app-id",
+    "secret" : null,
+    "invokeUrl" : "https://example.api.gov.sg:443/division/project/v1/apiName",
+    "signatureUrl" : "https://example.e.api.gov.sg:443/division/project/v1/apiName",
+    "httpHeaders" : null,
+    "httpMethod" : "GET",
+    "queryString" : { "clientname" : "node.js.test.l2", "data" : "some data value" },
+    "formData" :  null ,
+
+    "privateCertFileName" : "myCert.nopass.pem",
+    "privateCertFileType" : "pem",
+
+    "negativeTest" : false,
+    "debug" : false,
+
+    "ignoreServerCert" : true,
+
+    "nexthop": {
+        "authPrefix": "apex_l1_eg",
+        "realm" : "http://example.api.gov.sg",
+        "appId" : "app-id",
+        "secret" : "app-secret",
+        "signatureUrl" : "https://example.i.api.gov.sg:443/division/project/v1/apiName",
+        "httpMethod" : "GET",
+    }
+}
+```
+11. Execute Test with Timer
+```
+Promise.resolve()
+    // start the timer
+    .then(function() { return helper.startTestTimer() })
+
+    // sequential execution
+    .then(function() { return helper.performTest(params) })
+
+    // parallel execution
+    //.then(function() { return Promise.all([helper.performTest(params), helper.performTest(params)]) })
+
+    .then(helper.displayTestResult).then(message => console.log("\n" + message))
+    .then(helper.displayElapseTime).then(message => console.log("\n" + message + "\n"))
+    .catch(function(error) { 
+        console.log(error);
+    })
+;
+```
