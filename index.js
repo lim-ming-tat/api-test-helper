@@ -66,8 +66,8 @@ util.invokeRequest = (param) => {
             req = req.type("application/json").send(postData);
         }
 
+        // handle multiPartData POST request
         if (param.multiPartData != undefined) {
-            // Iterate through properties of headers
             if (param.multiPartData.fileds != undefined) {
                 for (let key in param.multiPartData.fileds) {
                     req = req.field(key, param.multiPartData.fileds[key]);
@@ -76,7 +76,13 @@ util.invokeRequest = (param) => {
 
             if (param.multiPartData.attachments != undefined) {
                 for (let key in param.multiPartData.attachments) {
-                    req = req.attach("files", param.multiPartData.attachments[key]);
+                    if (Array.isArray(param.multiPartData.attachments[key])) {
+                        _.forEach(param.multiPartData.attachments[key], function(paramValue) { req = req.attach("files", paramValue);; });
+                    }
+                    else 
+                    {
+                        req = req.attach(key, param.multiPartData.attachments[key]);
+                    }
                 }
             }
 

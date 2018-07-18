@@ -198,6 +198,7 @@ Promise.resolve()
             "mail[text]": "test html"
         },
         "attachments": {
+            "files": [ "./401-history.png", "./402-h2.png" ],
             "files1": "./401-history.png",
             "files2": "./402-h2.png"
         }
