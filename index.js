@@ -26,7 +26,7 @@ function nonceLib() {
 
 util.invokeRequest = (param) => {
     return new promise(function(resolve, reject){
-        if (param.ignoreServerCert)
+        if (param.ignoreServerCert == undefined || param.ignoreServerCert)
             process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
         const targetURL = new URL(param.invokeUrl);
@@ -64,6 +64,23 @@ util.invokeRequest = (param) => {
         if ((param.httpMethod == "POST" || param.httpMethod == "PUT") && param.jsonData != undefined) {
             let postData = JSON.stringify(param.jsonData);
             req = req.type("application/json").send(postData);
+        }
+
+        if (param.multiPartData != undefined) {
+            // Iterate through properties of headers
+            if (param.multiPartData.fileds != undefined) {
+                for (let key in param.multiPartData.fileds) {
+                    req = req.field(key, param.multiPartData.fileds[key]);
+                }
+            }
+
+            if (param.multiPartData.attachments != undefined) {
+                for (let key in param.multiPartData.attachments) {
+                    req = req.attach("files", param.multiPartData.attachments[key]);
+                }
+            }
+
+            req = req.type("multipart/form-data");
         }
 
         req.then(function(res) {

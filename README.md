@@ -173,3 +173,34 @@ Promise.resolve()
     })
 ;
 ```
+12. Submit Multi-Part POST
+```
+{
+    "id" : "1",
+    "description" : "Hedwig Test.",
+
+    "authPrefix": "apex_l1_eg",
+    "realm" : "http://node.js.test.l2.eg",
+    "appId" : "appName",
+    "secret" : "AppSecret",
+
+    "invokeUrl" : "https://playlab.api.lab/hedwig-intranet",
+    "signatureUrl" : "https://playlab.api.lab/hedwig-intranet",
+
+    "httpMethod" : "POST",
+
+    "multiPartData": { 
+        "fileds": { 
+            "mail[from]": "from@my.company.sg",
+            "mail[to]": "to@your.company.sg",
+            "mail[subject]": "multiPartData Test",
+            "mail[html]": "test text",
+            "mail[text]": "test html"
+        },
+        "attachments": {
+            "files1": "./401-history.png",
+            "files2": "./402-h2.png"
+        }
+    }
+}
+```
