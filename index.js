@@ -55,11 +55,17 @@ util.invokeRequest = (param) => {
             }
         }
 
-        if (param.httpMethod == "POST" || param.httpMethod == "PUT" && param.formData != undefined) {
+        
+        if ((param.httpMethod == "POST" || param.httpMethod == "PUT") && param.formData != undefined) {
             let postData = qs.stringify(param.formData, null, null, {encodeURIComponent: decodeURIComponent});
             req = req.type("application/x-www-form-urlencoded").set("Content-Length", Buffer.byteLength(postData)).send(postData);
         }
-        
+
+        if ((param.httpMethod == "POST" || param.httpMethod == "PUT") && param.jsonData != undefined) {
+            let postData = JSON.stringify(param.jsonData);
+            req = req.type("application/json").send(postData);
+        }
+
         req.then(function(res) {
             resolve(res);
         })
@@ -464,7 +470,7 @@ util.performTestGatewaySecurity = (param, verifyFunction) => {
             console.log();
             console.log(">>> " + param.id + ". " + param.description + " <<< - Failed. " + error);
             //console.log(">>> " + "URL: " + param.invokeUrl);
-            console.log(">>> " + "Param: " + JSON.stringify(param));
+            //console.log(">>> " + "Param: " + JSON.stringify(param));
             console.log();
         }
     });    
