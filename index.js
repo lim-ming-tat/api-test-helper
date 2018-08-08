@@ -55,7 +55,6 @@ util.invokeRequest = (param) => {
             }
         }
 
-        
         if ((param.httpMethod == "POST" || param.httpMethod == "PUT") && param.formData != undefined) {
             let postData = qs.stringify(param.formData, null, null, {encodeURIComponent: decodeURIComponent});
             req = req.type("application/x-www-form-urlencoded").set("Content-Length", Buffer.byteLength(postData)).send(postData);
@@ -89,7 +88,9 @@ util.invokeRequest = (param) => {
             req = req.type("multipart/form-data");
         }
 
+        //param.startTime = new Date();
         req.then(function(res) {
+            //param.endTime = new Date();
             resolve(res);
         })
         .catch(function(err) {
@@ -121,41 +122,66 @@ util.performTest = (params, verifyFunction) => {
         newParams = cloneParams.splice(0);
     }
 
-    // Implement repeats call for parameter with repeats attribute
-    if (item.repeats != undefined && item.repeats > 1){
-        var repeats = item.repeats - 2;
-        item.repeats = undefined;
+    var tangentialPromiseBranch = undefined;
 
-        // assign uuid to first item
-        if (item.queryString == undefined) item.queryString = {};
+    //parallel execution of call
+    if(item.parallel != undefined && item.parallel > 1) {
+        var parallel = item.parallel;
+        item.parallel = undefined;
 
-        var stringCopy = JSON.stringify(item);
+        var functionArray = [];
+        var itemJson = JSON.stringify(item);
 
-        item.queryString.uuid = require('uuid/v1')();
-        item.description += " uuid=" + item.queryString.uuid;
+        for (var i = 0; i < parallel; i++) {
+            var newItem = JSON.parse(itemJson);
 
-        var repeatedParam = "";
-        if (repeats == 0) {
-            // repeats 2 times, so just add 1 item
-            repeatedParam = JSON.parse('[' + stringCopy + ']');
-        } else {
-            repeatedParam = JSON.parse('[' + (stringCopy + ',').repeat(repeats) + stringCopy + ']');
+            if (newItem.queryString == undefined) newItem.queryString = {};
+
+            newItem.queryString.llid = require('uuid/v1')().substring(0,8);
+            newItem.description += " llid=" + newItem.queryString.llid;
+
+            functionArray.push(util.performTest(newItem, verifyFunction));
         }
 
-        // assign uuid to the rest
-        _.forEach(repeatedParam, function(param) { param.queryString.uuid = require('uuid/v1')(); param.description += " uuid=" + param.queryString.uuid; });
+        tangentialPromiseBranch = Promise.all(functionArray);
+    }
+    else 
+    {
+        // Implement repeats call for parameter with repeats attribute
+        if (item.repeats != undefined && item.repeats > 1){
+            var repeats = item.repeats - 2;
+            item.repeats = undefined;
 
-        newParams = _.concat(repeatedParam, newParams);
+            // assign uuid to first item
+            if (item.queryString == undefined) item.queryString = {};
+
+            var stringCopy = JSON.stringify(item);
+
+            item.queryString.uuid = require('uuid/v1')().substring(0,8);
+            item.description += " uuid=" + item.queryString.uuid;
+
+            var repeatedParam = "";
+            if (repeats == 0) {
+                // repeats 2 times, so just add 1 item
+                repeatedParam = JSON.parse('[' + stringCopy + ']');
+            } else {
+                repeatedParam = JSON.parse('[' + (stringCopy + ',').repeat(repeats) + stringCopy + ']');
+            }
+
+            // assign uuid to the rest
+            _.forEach(repeatedParam, function(param) { param.queryString.uuid = require('uuid/v1')().substring(0,8); param.description += " uuid=" + param.queryString.uuid; });
+
+            newParams = _.concat(repeatedParam, newParams);
+        }
+
+        tangentialPromiseBranch = testFunction(item, verifyFunction);
     }
 
-    var tangentialPromiseBranch = testFunction(item, verifyFunction).then(
+    return(tangentialPromiseBranch.then(
         function() {
             return( util.performTest( newParams, verifyFunction ) ); // RECURSE!
         }
-    )
-    ;
-
-    return( tangentialPromiseBranch );
+    ));
 }
 
 util.verifyJws = (param, response) => {
