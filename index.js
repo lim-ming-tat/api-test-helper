@@ -65,6 +65,15 @@ util.invokeRequest = (param) => {
             req = req.type("application/json").send(postData);
         }
 
+        if ((param.httpMethod == "POST" || param.httpMethod == "PUT") && param.postData != undefined) {
+            let postData = param.postData.data
+
+            if (param.postData.dataFileName != undefined)
+                postData = fs.readFileSync(param.postData.dataFileName, "utf8")
+
+            req = req.type(param.postData.contentType).send(postData);
+        }
+
         // handle multiPartData POST request
         if (param.multiPartData != undefined) {
             if (param.multiPartData.fileds != undefined) {
