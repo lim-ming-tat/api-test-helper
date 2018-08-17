@@ -1,0 +1,161 @@
+[
+    {
+        "id" : "L0",
+        "description" : "Gateway Security Parameter (L0) Template.",
+
+        "invokeUrl" : "https://www.example.com",
+
+        "queryString" : { "clientname" : "node.js.test.l0", "data" : "some data value" }
+    },
+    {
+        "id" : "L01",
+        "description" : "Gateway Security Parameter (L01) Template.",
+
+        "invokeUrl" : "https://www.example.com",
+
+        "queryString" : { "clientname" : "node.js.test.l01", "data" : "some data value" },
+
+        "nextHop" : {
+            "authPrefix": "apex_l1_ig",
+            "realm" : "http://node.js.test.l1.ig",
+            "appId" : "ig.app.name",
+            "secret" : "ig.l1.secret",
+
+            "signatureUrl" : "https://www.i.example.org/",
+            "httpMethod" : "GET"
+        }
+    },
+    {
+        "id" : "L02",
+        "description" : "Gateway Security Parameter (L02) Template.",
+
+        "invokeUrl" : "https://www.example.com",
+        
+        "queryString" : { "clientname" : "node.js.test.l02", "data" : "some data value" },
+
+        "nextHop" : {
+            "authPrefix": "apex_l2_ig",
+            "realm" : "http://node.js.test.l2.ig",
+            "appId" : "ig.app.name",
+            
+            "signatureUrl" : "https://www.i.example.org",
+            "httpMethod" : "GET",
+    
+            "privateCertFileName" : "./certs/private.key.pem",
+            "privateCertFileType" : "pem"
+        }
+    },
+    {
+        "id" : "L1",
+        "description" : "Gateway Security Parameter (L1) Template.",
+
+        "authPrefix": "apex_l1_eg",
+        "realm" : "http://node.js.test.l1.eg",
+        "appId" : "eg.app.name",
+        "secret" : "eg.l1.secret",
+        
+        "invokeUrl" : "https://www.example.com",
+        "signatureUrl" : "https://www.e.example.com",
+        "httpMethod" : "GET",
+        
+        "queryString" : { "clientname" : "node.js.test.l1", "data" : "some data value" }
+    },
+    {
+        "id" : "L11",
+        "description" : "Gateway Security Parameter (L11) Template.",
+
+        "authPrefix": "apex_l1_eg",
+        "realm" : "http://node.js.test.l11.eg",
+        "appId" : "eg.app.name",
+        "secret" : "eg.l1.secret",
+        
+        "invokeUrl" : "https://www.example.com",
+        "signatureUrl" : "https://www.e.example.com",
+        "httpMethod" : "GET",
+        
+        "queryString" : { "clientname" : "node.js.test.l11", "data" : "some data value" },
+
+        "nextHop" : {
+            "authPrefix": "apex_l1_ig",
+            "realm" : "http://node.js.test.l1.ig",
+            "appId" : "ig.app.name",
+            "secret" : "ig.l1.secret",
+            
+            "signatureUrl" : "https://www.i.example.org",
+            "httpMethod" : "GET"
+        }
+    },
+    {
+        "id" : "L12",
+        "description" : "Gateway Security Parameter (L12) Template.",
+
+        "authPrefix": "apex_l1_eg",
+        "realm" : "http://node.js.test.l1.eg",
+        "appId" : "eg.app.name",
+        "secret" : "eg.l1.secret",
+        
+        "invokeUrl" : "https://www.example.com",
+        "signatureUrl" : "https://www.e.example.com",
+        "httpMethod" : "GET",
+        
+        "queryString" : { "clientname" : "node.js.test.l12", "data" : "some data value" },
+
+        "nextHop" : {
+            "authPrefix": "apex_l2_ig",
+            "realm" : "http://node.js.test.l2.ig",
+            "appId" : "ig.app.name",
+            
+            "signatureUrl" : "https://www.e.example.com",
+            "httpMethod" : "GET",
+    
+            "privateCertFileName" : "./certs/private.key.pem",
+            "privateCertFileType" : "pem"
+        }
+    },
+    {
+        "id" : "L2",
+        "description" : "Gateway Security Parameter (L2) Template.",
+
+        "authPrefix": "apex_l2_eg",
+        "realm" : "http://node.js.test.l2.eg",
+        "appId" : "eg.app.name",
+        
+        "invokeUrl" : "https://www.example.com",
+        "signatureUrl" : "https://www.e.example.com",
+        "httpMethod" : "GET",
+        
+        "queryString" : { "clientname" : "node.js.test.l2", "data" : "some data value" },
+
+        "privateCertFileName" : "./certs/private.key.pem",
+        "privateCertFileType" : "pem"
+    },
+    {
+        "id" : "L22",
+        "description" : "Gateway Security Parameter (L22) Template.",
+
+        "authPrefix": "apex_l2_eg",
+        "realm" : "http://node.js.test.l2.eg",
+        "appId" : "eg.app.name",
+        
+        "invokeUrl" : "https://www.example.com",
+        "signatureUrl" : "https://www.e.example.com",
+        "httpMethod" : "GET",
+        
+        "queryString" : { "clientname" : "node.js.test.l22", "data" : "some data value" },
+
+        "privateCertFileName" : "./certs/private.key.pem",
+        "privateCertFileType" : "pem",
+
+        "nextHop" :     {
+            "authPrefix": "apex_l2_ig",
+            "realm" : "http://node.js.test.l2.ig",
+            "appId" : "ig.app.name",
+            
+            "signatureUrl" : "https://www.e.example.com",
+            "httpMethod" : "GET",
+    
+            "privateCertFileName" : "./certs/private.key.pem",
+            "privateCertFileType" : "pem"
+        }
+    }
+]

@@ -7,7 +7,7 @@ Helper Library to test API
 ```text
 npm i https://github.com/lim-ming-tat/api-test-helper.git --save
 ```
-2.1 The following dependency will be added to the package.json
+    The following dependency will be added to the package.json
 ```text
   "dependencies": {
     "api-test-helper": "git+https://github.com/lim-ming-tat/api-test-helper.git"
@@ -44,7 +44,7 @@ Promise.resolve()
 ```
 5. Execute the test.
 ```text
-node index
+node index.js
 ```
 6. Sample execution results and results
 ```text
@@ -119,7 +119,7 @@ Test Results::: 2/2
     "ignoreServerCert" : true
 }
 ```
-10. L21 Parameters Example
+10. L2 Parameters Example
 ```text
 {
     "id" : "L2",
@@ -160,11 +160,7 @@ Promise.resolve()
     // start the timer
     .then(function() { return helper.startTestTimer() })
 
-    // sequential execution
     .then(function() { return helper.performTest(params) })
-
-    // parallel execution
-    //.then(function() { return Promise.all([helper.performTest(params), helper.performTest(params)]) })
 
     .then(helper.displayTestResult).then(message => console.log("\n" + message))
     .then(helper.displayElapseTime).then(message => console.log("\n" + message + "\n"))
@@ -205,3 +201,5 @@ Promise.resolve()
     }
 }
 ```
+13. For more parameters options, please refer to ./test/sample.json and ./test/sample.security.json for details.
+14. For more configuration options, please refer to ./test/unitTest.js for details.
