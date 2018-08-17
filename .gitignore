@@ -1,3 +1,7 @@
+# custom test folders
+samples/
+test/
+
 # Logs
 logs
 *.log

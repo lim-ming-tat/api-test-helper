@@ -26,6 +26,7 @@ function nonceLib() {
 
 util.invokeRequest = (param) => {
     return new promise(function(resolve, reject){
+        process.env.NODE_TLS_REJECT_UNAUTHORIZED = "1";
         if (param.ignoreServerCert == undefined || param.ignoreServerCert)
             process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
@@ -76,9 +77,9 @@ util.invokeRequest = (param) => {
 
         // handle multiPartData POST request
         if (param.multiPartData != undefined) {
-            if (param.multiPartData.fileds != undefined) {
-                for (let key in param.multiPartData.fileds) {
-                    req = req.field(key, param.multiPartData.fileds[key]);
+            if (param.multiPartData.fields != undefined) {
+                for (let key in param.multiPartData.fields) {
+                    req = req.field(key, param.multiPartData.fields[key]);
                 }
             }
 
@@ -97,9 +98,9 @@ util.invokeRequest = (param) => {
             req = req.type("multipart/form-data");
         }
 
-        //param.startTime = new Date();
+        param.startTime = new Date();
         req.then(function(res) {
-            //param.endTime = new Date();
+            param.timespan = param.startTime.timespan();
             resolve(res);
         })
         .catch(function(err) {
@@ -346,6 +347,16 @@ util.verifyJwe = (param, response) => {
         });
 }
 
+util.displayExecutionTime = (param, response) => { return Promise.resolve().then( function() {
+    //console.log(":::" + param.startTime.format());
+    //console.log(":::" + param.timespan.endDate.format());
+    //console.log(":::" + param.timespan.toString());
+
+    console.log(">>> " + param.id + ". " + param.description + "::" + param.timespan.toString() + " <<< - Success.");
+
+    return true;
+} ) };
+
 util.displayTestResult = () => {
     return Promise.resolve("Test Results::: " + passedTest + "/" + totalTest);
 }
@@ -361,22 +372,7 @@ util.displayElapseTime = () => {
 
     var ts = startDate.timespan();
 
-    var message = "";
-    //message += "\n"; // console.log();
-    //console.log("Start Time " + startDate.format(dateFormat.masks.sgDateTime));
-    message += " Start Time: " + startDate.format() + "\n";
-    message += "   End Time: " + ts.endDate.format() + "\n";
-
-    if ((ts.totalSeconds()|0) == 0) {
-        message += "Elapse Time: " + ts.milliseconds + " milliseconds";
-    } else if ((ts.totalMinutes()|0) == 0) {
-        message += "Elapse Time: " + ts.seconds + " seconds " + ts.milliseconds + " milliseconds";
-    } else if ((ts.totalHours()|0) == 0) {
-        message += "Elapse Time: " + ts.minutes + " minutes " + ts.seconds + " seconds " + ts.milliseconds + " milliseconds";
-    } else {
-        message += "Elapse Time: " + (ts.totalHours()|0) + " hours " + ts.minutes + " minutes " + ts.seconds + " seconds " + ts.milliseconds + " milliseconds";
-    }
-    //message += "\n"; // console.log();
+    var message = getElapseTime(startDate, ts);
 
     return Promise.resolve(message);
 }
@@ -462,6 +458,8 @@ function propergateDefaultParam(param) {
 
     if (param.suppressMessage == undefined && defaultParam.suppressMessage != undefined) param.suppressMessage = defaultParam.suppressMessage;
     if (param.debug == undefined && defaultParam.debug != undefined) param.debug = defaultParam.debug;
+
+    if (param.showElapseTime == undefined && defaultParam.showElapseTime != undefined) param.showElapseTime = defaultParam.showElapseTime;
     
     return;
 }
@@ -513,7 +511,10 @@ util.performTestGatewaySecurity = (param, verifyFunction) => {
             passedTest++;
 
             if (debug) console.log("\n");
-            if(!param.suppressMessage) console.log(">>> " + param.id + ". " + param.description + " <<< - Success.");
+            if(!param.suppressMessage) {
+                console.log(">>> " + param.id + ". " + param.description + " <<< - Success.");
+                if (param.showElapseTime) console.log(getElapseTime(param.startTime, param.timespan));
+            }
         }
     }).catch(function(error) { 
         if (debug) console.log("\n");
@@ -523,7 +524,10 @@ util.performTestGatewaySecurity = (param, verifyFunction) => {
         if (param.negativeTest != undefined && param.negativeTest){
             passedTest++;
 
-            console.log(">>> " + param.id + ". " + param.description + " <<< - Negative Test Success. " + error);
+            if(!param.suppressMessage) {
+                console.log(">>> " + param.id + ". " + param.description + " <<< - Negative Test Success.\n" + error + "\n");
+                if (param.showElapseTime) console.log(getElapseTime(param.startTime, param.timespan));
+            }
         } else {
             console.log();
             console.log(">>> " + param.id + ". " + param.description + " <<< - Failed. " + error);
@@ -532,6 +536,25 @@ util.performTestGatewaySecurity = (param, verifyFunction) => {
             console.log();
         }
     });    
+}
+
+function getElapseTime(startDate, ts) {
+    var message = "";
+
+    message += " Start Time: " + startDate.format() + "\n";
+    message += "   End Time: " + ts.endDate.format() + "\n";
+
+    if ((ts.totalSeconds()|0) == 0) {
+        message += "Elapse Time: " + ts.milliseconds + " milliseconds";
+    } else if ((ts.totalMinutes()|0) == 0) {
+        message += "Elapse Time: " + ts.seconds + " seconds " + ts.milliseconds + " milliseconds";
+    } else if ((ts.totalHours()|0) == 0) {
+        message += "Elapse Time: " + ts.minutes + " minutes " + ts.seconds + " seconds " + ts.milliseconds + " milliseconds";
+    } else {
+        message += "Elapse Time: " + (ts.totalHours()|0) + " hours " + ts.minutes + " minutes " + ts.seconds + " seconds " + ts.milliseconds + " milliseconds";
+    }
+
+    return message;
 }
 
 module.exports = {
