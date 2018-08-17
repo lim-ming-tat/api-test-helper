@@ -4,59 +4,27 @@ const helper = require('./../index').apiHelper;
 
 const customVerifyJws = require('./customVerifyJws').customVerifyJws;
 const customVerifyJwe = require('./customVerifyJwe').customVerifyJwe;
+const customVerifyJweJws = require('./customVerifyJwe').customVerifyJweJws;
 
-//let params = require('./sample.json');
-//let params = require('./sample.repeats.json');
-//let params = require('./paramTest.json');
-//let params = require('./hedwig.json');
-//let params = require('./largeData.json');
-//let params = require('./20kbData.json');
-let params = require('./get6kbResponse.json');
+let params = require('./json/sample.json');
 
 // register verification function with helper library
 // this supports verification function for each call
+// default implementation
 //helper.myVerifyJws = helper.verifyJws;
+//helper.myVerifyJwe = helper.verifyJwe;
+// custom implementation
 helper.myVerifyJws = customVerifyJws;
 helper.myVerifyJwe = customVerifyJwe;
+helper.myVerifyJweJws = customVerifyJweJws;
 
 // to suppress the successfult message, will not suppress error message
-helper.setDefaultParam({ suppressMessage: false, debug : true });
+helper.setDefaultParam({ suppressMessage: false, debug : false, showElapseTime: false });
 
 Promise.resolve()
-    //.then(() => console.log(new Date()))
     .then(function() { return helper.startTestTimer() })
-    //.then(function() { return helper.performTest(params, helper.verifyJws) })
 
-    // sequential execution
-    //.then(function() { return helper.performTest(params) })
     .then(function() { return helper.performTest(params) })
-
-    // parallel execution
-    /*
-    .then(function() { return Promise.all([
-        helper.performTest(params)
-        , helper.performTest(params)
-        , helper.performTest(params)
-        , helper.performTest(params)
-        , helper.performTest(params)
-        , helper.performTest(params)
-        , helper.performTest(params)
-        , helper.performTest(params)
-        , helper.performTest(params)
-        , helper.performTest(params)
-        , helper.performTest(params)
-        , helper.performTest(params)
-        , helper.performTest(params)
-        , helper.performTest(params)
-        , helper.performTest(params)
-        , helper.performTest(params)
-        , helper.performTest(params)
-        , helper.performTest(params)
-        , helper.performTest(params)
-        , helper.performTest(params)
-    ]) })
-    */
-    //.then(() => console.log(new Date()))
 
     .then(helper.displayTestResult).then(message => console.log("\n" + message))
     .then(helper.displayElapseTime).then(message => console.log("\n" + message + "\n"))

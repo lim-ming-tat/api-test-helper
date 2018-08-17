@@ -1,121 +1,146 @@
 [
     {
-        "id" : "1",
-        "description" : "Gateway Security Parameter (L2) Template.",
+        "invokeUrl" : "http://www.example.com/"
+    },
+    {
+        "id" : "002.1",
+        "description" : "Parameters Template. Mandatory property 'invokeUrl'. <<<\n>>> By default 'httpMethod' is set to 'GET'.<<<\n>>>",
 
-        "authPrefix": "apex_l2_eg",
-        "realm" : "http://node.js.test.l2.eg",
-        "appId" : "playground-4L5mrKdV6QQ8xhg9gxE9Ou92",
-        "secret" : null,
-        "invokeUrl" : "https://playground.api.gov.sg:443/api/v1/rest/level2/ex-ex",
-        "signatureUrl" : "https://playground.e.api.gov.sg:443/api/v1/rest/level2/ex-ex",
-        "httpHeaders" : null,
-        "httpMethod" : "GET",
-        "queryString" : { "clientname" : "node.js.test.l2", "data" : "some data value" },
-        "formData" :  null ,
+        "invokeUrl" : "http://www.example.com/"
+    },
+    {
+        "id" : "002.2",
+        "description" : "Parameters Template. Turn on debug flag to display verbose message.<<<\n>>> By default 'debug' flag is set to 'false'.<<<\n>>>",
 
-        "signatureMethod" : null,
-        "nonce" : null,
-        "timestamp" : null,
-        "signature" : null,
+        "invokeUrl" : "http://www.example.com/",
+        "debug" : true
+    },
+    {
+        "id" : "003.1",
+        "description" : "Parameters Template. Invalid URL.",
 
-        "_privateCertFileName" : "Support private key in pem format for JWE and L2.",
-        "privateCertFileName" : "/Users/mingtat.lim/SourceTree/jmeter-scripts/sgcore/alpha.apex.gov.sg.nopass.pem",
-        "privateCertFileType" : "pem",
+        "invokeUrl" : "https://www.sample.com/"
+    },
+    {
+        "id" : "003.2",
+        "description" : "Parameters Template. Negative test flag set to true and will be counted as successful called. <<<\n>>> By default 'negativeTest' flag is set to 'False'.<<<\n>>>",
 
-        "_publicCertFileName" : "Support public key in pem & der format for JWS.",
-        "publicCertFileName" : "/Users/mingtat.lim/SourceTree/jmeter-scripts/sgcore/beta.apex.gov.sg.cer",
-        "publicCertFileType" : "pem",
-    
-        "negativeTest" : false,
-        "debug" : false,
+        "invokeUrl" : "https://www.sample.com/",
+
+        "negativeTest" : true
+    },
+    {
+        "id" : "003.3",
+        "description" : "Parameters Template. Ignore server certificate(SSL) flag. <<<\n>>> By default 'ignoreServerCert' flag is set to 'True'.<<<\n>>>",
+
+        "invokeUrl" : "https://ssl1.sherlock-aws.ai/api/helloworld",
 
         "ignoreServerCert" : false,
-        "caCertFileName" : "../certProd/COMODO_RSA_Certification_Authority.public.pem",
+        "caCertFileName" : "./certs/NECTAR-CA.pem",
         "caCertFileType" : "pem"
     },
     {
-        "id" : "2",
-        "description" : "Gateway Security Parameter (L0) Template. External URL Test.",
-
-        "authPrefix": null,
-        "realm" : null,
-        "appId" : null,
-        "secret" : null,
-        "invokeUrl" : "http://www.example.com/",
-        "signatureUrl" : null,
-        "httpHeaders" : null,
-        "httpMethod" : "GET",
-        "queryString" : null,
-        "formData" :  null ,
-
-        "signatureMethod" : null,
-        "nonce" : null,
-        "timestamp" : null,
-        "signature" : null,
-        "certFileName" : null,
-        "certFileType" : null,
-
-        "negativeTest" : false,
-        "debug" : false,
-
-        "ignoreServerCert" : true,
-        "caFileName" : null
-    },
-    {
-        "id" : "3",
-        "description" : "Parameter Template. Minimum properties test.",
+        "id" : "004.1",
+        "description" : "Parameters Template. Execute call multiple times by setting 'repeats' property(integer). Each call will be tag with QueryString.",
 
         "invokeUrl" : "http://www.example.com/",
-        "httpMethod" : "GET"
+
+        "repeats" : 2
     },
     {
-        "id" : "4",
-        "description" : "Parameter Template. Debug on test.",
+        "id" : "004.2",
+        "description" : "Parameters Template. Execute call in parallel by setting 'parallel' property(integer). Each call will be tag with QueryString.",
 
         "invokeUrl" : "http://www.example.com/",
-        "httpMethod" : "GET"
+
+        "repeats" : 2,
+        "parallel" : 2
     },
     {
-        "id" : "JOSE.jws",
-        "description" : "Parameter Template. JWS.",
-        "apiName" : "Helljoseoworld REST JOSE",
-    
-        "invokeUrl" : "https://playground.api.gov.sg:443/api/v1/rest/jose/ex-ex",
-        "httpMethod" : "GET",
-    
-        "httpHeaders" : { "Accept" : "application/jose+jws" },
-    
-        "publicCertFileName" : "/Users/mingtat.lim/SourceTree/jmeter-scripts/sgcore/xray.apex.gov.sg.cer",
-        "publicCertFileType" : "pem",
-    
-        "verifyFunction" : "myVerifyJws",
-    
-        "debug" : false
+        "id" : "004.3",
+        "description" : "Parameters Template. Call with QueryString.",
+
+        "invokeUrl" : "http://www.example.com/",
+
+        "queryString" : { "clientname" : "node.js.test", "param1" : "data 1", "param2" : "data 2" }
     },
     {
-        "id" : "JOSE.jwe",
-        "description" : "Parameter Template. JWE.",
-        "apiName" : "Helljoseoworld REST JOSE",
+        "id" : "004.4",
+        "description" : "Parameters Template. Call with Headers.",
 
-        "authPrefix": "apex_l2_eg",
-        "realm" : "http://node.js.test.l2.eg",
-        "appId" : "playground-4L5mrKdV6QQ8xhg9gxE9Ou92",
-        "secret" : null,
-        "invokeUrl" : "https://playground.api.gov.sg:443/api/v1/rest/jose/ex-ex",
-        "signatureUrl" : "https://playground.e.api.gov.sg:443/api/v1/rest/jwe/ex-ex/",
-        "httpHeaders" : { "Accept" : "application/jose+jwe" },
-        "httpMethod" : "GET",
-        "queryString" : { "clientname" : "node.js.test.l2", "data" : "some data value" },
-        "formData" :  null ,
+        "invokeUrl" : "http://www.example.com/",
 
-        "privateCertFileName" : "/Users/mingtat.lim/SourceTree/jmeter-scripts/sgcore/alpha.apex.gov.sg.nopass.pem",
-        "privateCertFileType" : "pem",
+        "httpHeaders" : { "Accept" : "application/jose+jws", "Accept-Charset" : "utf-8" }
+    },
+    {
+        "id" : "005.1",
+        "description" : "Parameters Template. Submit form data.",
 
-        "verifyFunction" : "myVerifyJwe",
+        "invokeUrl" : "http://www.example.com/",
 
-        "repeats": 5,
-        
-        "debug" : false
+        "httpMethod" : "POST",
+        "formData" : { "clientname" : "node.js.test", "param1" : "data 1", "param2" : "data 2" }
+    },
+    {
+        "id" : "005.2",
+        "description" : "Parameters Template. Submit multi-part form data.",
+
+        "invokeUrl" : "http://www.example.com/",
+
+        "httpMethod" : "POST",
+        "multiPartData": { 
+            "fields": {
+                "mail[from]": "from@gov.sg",
+                "mail[to]": "to@gov.sg",
+                "mail[subject]": "email subject",
+                "mail[html]": "<b>email html</b>",
+                "mail[text]": "email text"
+            },
+            "attachments": {
+                "files": [ "./resources/401-history.png", "./resources/402-h2.png" ],
+                "fieldName": "./resources/500-warner-tv-encore.png"
+            }
+        }
+    },
+    {
+        "id" : "005.3",
+        "description" : "Parameters Template. Submit JSON data.",
+
+        "invokeUrl" : "http://www.example.com/",
+
+        "httpMethod" : "POST",
+        "jsonData" :  {
+            "mail" : {
+                "from" : "from@gov.sg",
+                "to" : "to@gov.sg",
+                "subject" : "email subject",
+                "text" : "email text",
+                "html" : "<b>email html</b>" 
+            }
+        }
+    },
+    {
+        "id" : "005.4",
+        "description" : "Parameters Template. Submit other data type.",
+
+        "invokeUrl" : "http://www.example.com/",
+
+        "httpMethod" : "POST",
+        "postData" : {
+            "contentType" : "application/soap+xml",
+            "data" : "<soapenv:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:urn=\"urn:examples:helloservice\"><soapenv:Header/><soapenv:Body><urn:helloworld soapenv:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><kbsize xsi:type=\"xsd:int\">2</kbsize><random xsi:type=\"xsd:string\">2</random><clientname xsi:type=\"xsd:string\">3</clientname></urn:helloworld></soapenv:Body></soapenv:Envelope>"
+        }
+    },
+    {
+        "id" : "005.5",
+        "description" : "Parameters Template. Submit other data type from file (utf8).",
+
+        "invokeUrl" : "http://www.example.com/",
+
+        "httpMethod" : "POST",
+        "postData" : {
+            "contentType" : "application/soap+xml",
+            "dataFileName" : "./resources/soap.l2.xml"
+        }
     }
 ]

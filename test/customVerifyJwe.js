@@ -3,6 +3,8 @@
 const jose = require('node-jose');
 const fs = require('fs');
 
+const customVerifyJws = require('./customVerifyJws').customVerifyJws;
+
 // please refer to node-jose library for supported certificate type
 var param = {
     "privateCertFileName" : "myCert.pem",
@@ -11,6 +13,17 @@ var param = {
 
 // response - http response object
 function customVerifyJwe(param, response) {
+    param.verifyJweJws = false;
+    return customVerifyJose(param, response);
+}
+
+function customVerifyJweJws(param, response) {
+    param.verifyJweJws = true;
+    return customVerifyJose(param, response);
+}
+
+// response - http response object
+function customVerifyJose(param, response) {
     var data = {};
 
     // convert compact to JSON
@@ -36,12 +49,14 @@ function customVerifyJwe(param, response) {
     if (param.privateCertFileType == undefined) throw Error("Property 'privateCertFileType' not provided.");
 
     var privateKey = fs.readFileSync(param.privateCertFileName, "utf8");
+    //var privateKey = fs.readFileSync(param.jwePrivateCertFileName, "utf8");
 
     // create keystore for jose
     var keystore = jose.JWK.createKeyStore();
 
     // convert private key into JWK
     return keystore.add(privateKey, param.privateCertFileType)
+    //return keystore.add(privateKey, param.jwePrivateCertFileType)
         .then(function(jweKey) {
             // {result} is a jose.JWK.Key
 
@@ -54,8 +69,26 @@ function customVerifyJwe(param, response) {
                         
                         console.log("\n");
                     }
+
                     if(!param.suppressMessage) {
                         console.log(">>> " + param.id + ". " + param.description + " <<< - JWE Verification Success.");
+                    }
+
+                    if (param.verifyJweJws) {
+                        param.id = ">>>(JWE-JWS) " + param.id;
+
+                        var customResponse = {};
+
+                        if (result.payload.toString().substr(0, 1) == "{") {
+                            customResponse.type = "application/jose+json"
+                            customResponse.body = JSON.parse(result.payload.toString());
+                        }
+                        else {
+                            customResponse.type = "application/jose"
+                            customResponse.text = result.payload.toString();
+                        }
+
+                        return customVerifyJws(param, customResponse);
                     }
 
                     return true;
@@ -76,5 +109,6 @@ function customVerifyJwe(param, response) {
 }
 
 module.exports = {
-    customVerifyJwe : customVerifyJwe
+    customVerifyJwe : customVerifyJwe,
+    customVerifyJweJws : customVerifyJweJws
 };
