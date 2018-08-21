@@ -66,13 +66,13 @@ util.invokeRequest = (param) => {
             req = req.type("application/json").send(postData);
         }
 
-        if ((param.httpMethod == "POST" || param.httpMethod == "PUT") && param.postData != undefined) {
-            let postData = param.postData.data
+        if ((param.httpMethod == "POST" || param.httpMethod == "PUT") && param.textData != undefined) {
+            let postData = param.textData.data
 
-            if (param.postData.dataFileName != undefined)
-                postData = fs.readFileSync(param.postData.dataFileName, "utf8")
+            if (param.textData.dataFileName != undefined)
+                postData = fs.readFileSync(param.textData.dataFileName, "utf8")
 
-            req = req.type(param.postData.contentType).send(postData);
+            req = req.type(param.textData.contentType).send(postData);
         }
 
         // handle multiPartData POST request

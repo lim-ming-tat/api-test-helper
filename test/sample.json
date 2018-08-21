@@ -126,7 +126,7 @@
         "invokeUrl" : "http://www.example.com/",
 
         "httpMethod" : "POST",
-        "postData" : {
+        "textData" : {
             "contentType" : "application/soap+xml",
             "data" : "<soapenv:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:urn=\"urn:examples:helloservice\"><soapenv:Header/><soapenv:Body><urn:helloworld soapenv:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><kbsize xsi:type=\"xsd:int\">2</kbsize><random xsi:type=\"xsd:string\">2</random><clientname xsi:type=\"xsd:string\">3</clientname></urn:helloworld></soapenv:Body></soapenv:Envelope>"
         }
@@ -138,7 +138,7 @@
         "invokeUrl" : "http://www.example.com/",
 
         "httpMethod" : "POST",
-        "postData" : {
+        "textData" : {
             "contentType" : "application/soap+xml",
             "dataFileName" : "./resources/soap.l2.xml"
         }
