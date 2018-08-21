@@ -81,6 +81,15 @@ util.invokeRequest = (param) => {
             req = req.type(param.textData.contentType).send(postData);
         }
 
+        if ((param.httpMethod == "POST" || param.httpMethod == "PUT") && param.binaryData != undefined) {
+            let postData = null;
+
+            if (param.binaryData.dataFileName != undefined)
+                postData = fs.readFileSync(param.binaryData.dataFileName)
+
+            req = req.type(param.binaryData.contentType).send(postData);
+        }
+
         // handle multiPartData POST request
         if (param.multiPartData != undefined) {
             if (param.multiPartData.fields != undefined) {
