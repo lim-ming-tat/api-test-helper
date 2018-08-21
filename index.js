@@ -104,6 +104,7 @@ util.invokeRequest = (param) => {
             resolve(res);
         })
         .catch(function(err) {
+            param.timespan = param.startTime.timespan();
             reject(err);
         });
     });
@@ -531,6 +532,7 @@ util.performTestGatewaySecurity = (param, verifyFunction) => {
         } else {
             console.log();
             console.log(">>> " + param.id + ". " + param.description + " <<< - Failed. " + error);
+            if (param.showElapseTime) console.log(getElapseTime(param.startTime, param.timespan));
             //console.log(">>> " + "URL: " + param.invokeUrl);
             //console.log(">>> " + "Param: " + JSON.stringify(param));
             console.log();
@@ -553,6 +555,7 @@ function getElapseTime(startDate, ts) {
     } else {
         message += "Elapse Time: " + (ts.totalHours()|0) + " hours " + ts.minutes + " minutes " + ts.seconds + " seconds " + ts.milliseconds + " milliseconds";
     }
+    message += "\n";
 
     return message;
 }
