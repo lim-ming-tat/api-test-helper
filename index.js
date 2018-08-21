@@ -62,6 +62,12 @@ util.invokeRequest = (param) => {
         }
 
         if ((param.httpMethod == "POST" || param.httpMethod == "PUT") && param.jsonData != undefined) {
+            if (param.base64Data != undefined) {
+                let buff = fs.readFileSync(param.base64Data.dataFileName);  
+                let base64data = buff.toString('base64');
+                param.jsonData[param.base64Data.fieldName] = base64data;
+            }
+
             let postData = JSON.stringify(param.jsonData);
             req = req.type("application/json").send(postData);
         }
@@ -542,6 +548,7 @@ util.performTestGatewaySecurity = (param, verifyFunction) => {
 
 function getElapseTime(startDate, ts) {
     var message = "";
+    if (startDate == undefined || ts == undefined) return message;
 
     message += " Start Time: " + startDate.format() + "\n";
     message += "   End Time: " + ts.endDate.format() + "\n";
