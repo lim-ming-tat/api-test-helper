@@ -20,9 +20,7 @@ npm i https://github.com/lim-ming-tat/api-test-helper.git --save
         "description" : "Simple Parameter Template.",
 
         "invokeUrl" : "http://www.example.com/",
-        "httpMethod" : "GET",
-
-        "debug" : false
+        "httpMethod" : "GET"
     }
 ```
 4. Code Sample, save the following code in index.js file
@@ -60,10 +58,10 @@ Test Results::: 2/2
     "id" : "L0",
     "description" : "Gateway Security Parameter (L0) Template.",
 
-    "invokeUrl" : "https://sample.api.gov.sg:443/api/v1/myApi",
+    "invokeUrl" : "https://sample.api.gov.sg:443/division/v1/myResources",
     "httpMethod" : "GET",
+
     "queryString" : { "clientname" : "node.js.test.l0", "data" : "some data value" },
-    "formData" :  null ,
 
     "debug" : false
 }
@@ -78,15 +76,12 @@ Test Results::: 2/2
     "realm" : "http://example.api.gov.sg",
     "appId" : "app-id",
     "secret" : "app-secret",
-    "invokeUrl" : "https://example.api.gov.sg:443/division/project/v1/apiName",
-    "signatureUrl" : "https://example.e.api.gov.sg:443/division/project/v1/apiName",
-    "httpHeaders" : null,
+
+    "invokeUrl" : "https://example.api.gov.sg:443/division/project/v1/myResources",
+    "signatureUrl" : "https://example.e.api.gov.sg:443/division/project/v1/myResources",
+
     "httpMethod" : "GET",
     "queryString" : { "clientname" : "node.js.test.l1", "data" : "some data value" },
-    "formData" :  null ,
-
-    "negativeTest" : false,
-    "debug" : false,
 
     "ignoreServerCert" : false,
     "caCertFileName" : "COMODO_RSA_Certification_Authority.public.pem",
@@ -102,24 +97,18 @@ Test Results::: 2/2
     "authPrefix": "apex_l2_eg",
     "realm" : "http://example.api.gov.sg",
     "appId" : "app-id",
-    "secret" : null,
-    "invokeUrl" : "https://example.api.gov.sg:443/division/project/v1/apiName",
-    "signatureUrl" : "https://example.e.api.gov.sg:443/division/project/v1/apiName",
-    "httpHeaders" : null,
+
+    "invokeUrl" : "https://example.api.gov.sg:443/division/project/v1/myResources",
+    "signatureUrl" : "https://example.e.api.gov.sg:443/division/project/v1/myResources",
+
     "httpMethod" : "GET",
     "queryString" : { "clientname" : "node.js.test.l2", "data" : "some data value" },
-    "formData" :  null ,
 
     "privateCertFileName" : "myCert.nopass.pem",
-    "privateCertFileType" : "pem",
-
-    "negativeTest" : false,
-    "debug" : false,
-
-    "ignoreServerCert" : true
+    "privateCertFileType" : "pem"
 }
 ```
-10. L2 Parameters Example
+10. L21 Parameters Example
 ```text
 {
     "id" : "L2",
@@ -128,29 +117,25 @@ Test Results::: 2/2
     "authPrefix": "apex_l2_eg",
     "realm" : "http://example.api.gov.sg",
     "appId" : "app-id",
-    "secret" : null,
-    "invokeUrl" : "https://example.api.gov.sg:443/division/project/v1/apiName",
-    "signatureUrl" : "https://example.e.api.gov.sg:443/division/project/v1/apiName",
-    "httpHeaders" : null,
+
+    "invokeUrl" : "https://example.api.gov.sg:443/division/project/v1/myResources",
+    "signatureUrl" : "https://example.e.api.gov.sg:443/division/project/v1/myResources",
+
     "httpMethod" : "GET",
     "queryString" : { "clientname" : "node.js.test.l2", "data" : "some data value" },
-    "formData" :  null ,
+
 
     "privateCertFileName" : "myCert.nopass.pem",
     "privateCertFileType" : "pem",
 
-    "negativeTest" : false,
-    "debug" : false,
-
-    "ignoreServerCert" : true,
-
-    "nexthop": {
-        "authPrefix": "apex_l1_eg",
+    "nextHop": {
+        "authPrefix": "apex_l1_ig",
         "realm" : "http://example.api.gov.sg",
         "appId" : "app-id",
         "secret" : "app-secret",
-        "signatureUrl" : "https://example.i.api.gov.sg:443/division/project/v1/apiName",
-        "httpMethod" : "GET",
+
+        "signatureUrl" : "https://example.i.api.gov.sg:443/division/project/v1/myResources",
+        "httpMethod" : "GET"
     }
 }
 ```
@@ -168,6 +153,16 @@ Promise.resolve()
         console.log(error);
     })
 ;
+```
+Test Result Sample
+```text
+...
+
+Test Results::: 1/2
+
+ Start Time: 2018-08-23 16:28:59.834
+   End Time: 2018-08-23 16:29:00.667
+Elapse Time: 833 milliseconds
 ```
 12. Submit Multi-Part POST
 ```
