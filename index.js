@@ -476,6 +476,7 @@ function propergateDefaultParam(param) {
     if (param.debug == undefined && defaultParam.debug != undefined) param.debug = defaultParam.debug;
 
     if (param.showElapseTime == undefined && defaultParam.showElapseTime != undefined) param.showElapseTime = defaultParam.showElapseTime;
+    if (param.skipTest == undefined && defaultParam.skipTest != undefined) param.skipTest = defaultParam.skipTest;
     
     return;
 }
@@ -483,6 +484,10 @@ function propergateDefaultParam(param) {
 util.performTestGatewaySecurity = (param, verifyFunction) => {
     // propagate default params
     propergateDefaultParam(param);
+
+    if (param.skipTest != undefined && param.skipTest) {
+        return Promise.resolve();
+    }
 
     // test count
     totalTest += 1;
@@ -569,6 +574,9 @@ util.performTestGatewaySecurity = (param, verifyFunction) => {
                 console.log(error.response.error.text);
                 console.log("=== errorText::: ===");
             }
+
+            console.log("\nURL:::");
+            console.log(param.invokeUrl);
             
             if (param.showElapseTime) console.log("\n" + getElapseTime(param.startTime, param.timespan));
             //console.log(">>> " + "URL: " + param.invokeUrl);
