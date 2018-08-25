@@ -492,6 +492,16 @@ util.performTestGatewaySecurity = (param, verifyFunction) => {
 
     if (debug) console.log("\n>>> " + param.id + ". " + param.description + " <<< - Start.");
 
+    // validate parameters here...
+    if (param.formData != undefined && Array.isArray(param.formData)) {
+        //throw Error("Property 'formData' cannot be an array. \nparam::" + JSON.stringify(param));
+        return Promise.reject("\n>>> " + param.id + ". " + param.description + "<<< Property 'formData' cannot be an array.\nparam::::" + JSON.stringify(param));
+    }
+    if (param.queryString != undefined && Array.isArray(param.queryString)) {
+        //throw Error("Property 'queryString' cannot be an array. param::" + JSON.stringify(param));
+        return Promise.reject("\n>>> " + param.id + ". " + param.description + "<<< Property 'queryString' cannot be an array.\nparam:::" + JSON.stringify(param));
+    }
+
     try {
         util.getApexSecurityToken(param);
     } catch (error) {
