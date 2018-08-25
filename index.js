@@ -543,9 +543,11 @@ util.performTestGatewaySecurity = (param, verifyFunction) => {
             }
         }
     }).catch(function(error) { 
-        if (debug) console.log("\n");
-        if (debug) console.log("HTTP Call Failed..." + error);
-        if (debug) console.log("\n");
+        if (debug) {
+            console.log("\n");
+            console.log("HTTP Call Failed..." + error);
+            console.log("\n");
+        }
 
         if (param.negativeTest != undefined && param.negativeTest){
             passedTest++;
@@ -557,7 +559,16 @@ util.performTestGatewaySecurity = (param, verifyFunction) => {
         } else {
             console.log();
             console.log(">>> " + param.id + ". " + param.description + " <<< - Failed. " + error);
-            if (param.showElapseTime) console.log(getElapseTime(param.startTime, param.timespan));
+                
+            console.log(">>> statusCode::: " + error.response.statusCode);
+            console.log(">>> clientError::: " + error.response.clientError);
+            console.log(">>> serverError::: " + error.response.serverError);
+    
+            console.log("=== errorText::: ===");
+            console.log(error.response.error.text);
+            console.log("=== errorText::: ===");
+            
+            if (param.showElapseTime) console.log("\n" + getElapseTime(param.startTime, param.timespan));
             //console.log(">>> " + "URL: " + param.invokeUrl);
             //console.log(">>> " + "Param: " + JSON.stringify(param));
             console.log();
