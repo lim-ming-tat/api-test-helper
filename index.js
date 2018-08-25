@@ -559,19 +559,21 @@ util.performTestGatewaySecurity = (param, verifyFunction) => {
         } else {
             console.log();
             console.log(">>> " + param.id + ". " + param.description + " <<< - Failed. " + error);
-                
-            console.log(">>> statusCode::: " + error.response.statusCode);
-            console.log(">>> clientError::: " + error.response.clientError);
-            console.log(">>> serverError::: " + error.response.serverError);
-    
-            console.log("=== errorText::: ===");
-            console.log(error.response.error.text);
-            console.log("=== errorText::: ===");
+
+            if (error.response != undefined) {
+                console.log(">>> statusCode::: " + error.response.statusCode);
+                console.log(">>> clientError::: " + error.response.clientError);
+                console.log(">>> serverError::: " + error.response.serverError);
+        
+                console.log("=== errorText::: ===");
+                console.log(error.response.error.text);
+                console.log("=== errorText::: ===");
+            }
             
             if (param.showElapseTime) console.log("\n" + getElapseTime(param.startTime, param.timespan));
             //console.log(">>> " + "URL: " + param.invokeUrl);
             //console.log(">>> " + "Param: " + JSON.stringify(param));
-            console.log();
+            //console.log();
         }
     });    
 }
