@@ -17,6 +17,7 @@ var _debug = false;
 
 var totalTest = 0;
 var passedTest = 0;
+var skipTest = 0;
 
 let util = {};
 
@@ -101,10 +102,18 @@ util.invokeRequest = (param) => {
             if (param.multiPartData.attachments != undefined) {
                 for (let key in param.multiPartData.attachments) {
                     if (Array.isArray(param.multiPartData.attachments[key])) {
-                        _.forEach(param.multiPartData.attachments[key], function(paramValue) { req = req.attach("files", paramValue);; });
-                    }
-                    else 
-                    {
+                        _.forEach(param.multiPartData.attachments[key], function(paramValue) { 
+                            // trigger error if file not found...
+                            // req.attach does not propagate error
+                            fs.readFileSync(paramValue);
+
+                            req = req.attach("files", paramValue);
+                        });
+                    } else {
+                        // trigger error if file not found...
+                        // req.attach does not propagate error
+                        fs.readFileSync(param.multiPartData.attachments[key]);
+
                         req = req.attach(key, param.multiPartData.attachments[key]);
                     }
                 }
@@ -128,7 +137,8 @@ util.invokeRequest = (param) => {
 util.performTest = (params, verifyFunction) => {
     //console.log( "Entering recursive function for [", params.length, "]." );
     
-    var testFunction = util.performTestGatewaySecurity;
+    //var testFunction = util.performTestGatewaySecurity;
+    var testFunction = util.executeTest;
 
     // Once we hit zero, bail out of the recursion. The key to recursion is that
     // it stops at some point, and the callstack can be "rolled" back up.
@@ -200,7 +210,8 @@ util.performTest = (params, verifyFunction) => {
             newParams = _.concat(repeatedParam, newParams);
         }
 
-        tangentialPromiseBranch = testFunction(item, verifyFunction);
+        //tangentialPromiseBranch = testFunction(item, verifyFunction);
+        tangentialPromiseBranch = testFunction(item);
     }
 
     return(tangentialPromiseBranch.then(
@@ -374,7 +385,7 @@ util.displayExecutionTime = (param, response) => { return Promise.resolve().then
 } ) };
 
 util.displayTestResult = () => {
-    return Promise.resolve("Test Results::: " + passedTest + "/" + totalTest);
+    return Promise.resolve("Test Results::: " + passedTest + "/" + totalTest + "\n   Skip Test::: " + skipTest);
 }
 
 var startDate;
@@ -406,8 +417,10 @@ function showBaseString(param) {
         nonce: param.nonce || "nonce",
         timestamp: param.timestamp || "timestamp"
     };
-    let baseString = apex.getSignatureBaseString(baseProps);
-    console.log('\nBaseString::: \n\"' + baseString + "\"\n");
+    //let baseString = apex.getSignatureBaseString(baseProps);
+    //console.log('\nBaseString::: \n\"' + baseString + "\"\n");
+
+    param.baseString = apex.getSignatureBaseString(baseProps);
 }
 
 util.getApexSecurityToken = (param) => {
@@ -460,7 +473,7 @@ util.getApexSecurityToken = (param) => {
         }
     }
 
-    if (param.debug && param.signature != undefined) console.log('\nSignature::: \n' + param.signature);    
+    //if (param.debug && param.signature != undefined) console.log('\nSignature::: \n' + param.signature);    
 }
 
 var defaultParam = undefined;
@@ -469,7 +482,7 @@ util.setDefaultParam = (defaultValue) => {
 }
 
 // TODO: to support more default properties...
-function propergateDefaultParam(param) {
+function propagateDefaultValue(param) {
     if (defaultParam == undefined) return;
 
     if (param.suppressMessage == undefined && defaultParam.suppressMessage != undefined) param.suppressMessage = defaultParam.suppressMessage;
@@ -481,9 +494,127 @@ function propergateDefaultParam(param) {
     return;
 }
 
+util.executeTest = (param) => {
+    //console.log("executeTest:::");
+    return new promise(function(resolve, reject){
+        // propagate default params
+        propagateDefaultValue(param);
+
+        if (param.skipTest != undefined && param.skipTest) {
+            return resolve();
+        }
+
+        // Count Test
+        totalTest += 1;
+
+        // validate parameters here...
+        if (param.formData != undefined && Array.isArray(param.formData)) {
+            throw new Error("Property 'formData' cannot be an array.\nparam:::\n" + JSON.stringify(param, null, 4));
+        }
+
+        if (param.queryString != undefined && Array.isArray(param.queryString)) {
+            throw new Error("Property 'queryString' cannot be an array.\nparam:::\n" + JSON.stringify(param, null, 4));
+        }
+
+        // get the authorization token
+        util.getApexSecurityToken(param);
+
+        return util.invokeRequest(param).then(function(res){
+            //console.log("response.type:::" + res.type);
+            //console.log("response.type:::" + typeis(res.type, ['application/json']));
+
+            if (!_.isEmpty(res.body))
+                param.responseBody = res.body;
+            else
+                param.responseText = res.text;
+    
+            if (param.verifyFunction != undefined) {
+                if (param.verifyMessage == undefined) param.verifyMessage = "\n";
+
+                // execute verification function from parameters
+                return util[param.verifyFunction](param, res).then(testResult => { param.testPassed = testResult; });
+            } else {
+                // test pass
+                param.testPassed = true;
+            }
+        }).catch(function(error) { 
+            param.error = error;
+
+            if (param.negativeTest != undefined && param.negativeTest){
+                param.testPassed = true;
+            }
+        }).finally( () => { return resolve() });
+    }).catch(function(error) {
+        param.error = error;
+    }).finally( () => {
+        //console.log();
+        //console.log(">>><<< finally... >>><<<");
+        //console.log("~~~~~~~~~~~");
+        if (param.skipTest != undefined && param.skipTest) {
+            skipTest++;
+            return;
+        }
+
+        if (param.debug) {
+            console.log(">>> " + param.id + ". " + param.description + " <<< - Start.");
+
+            if (param.baseString != undefined) console.log('\nBaseString::: \n' + param.baseString);    
+            if (param.nextHop != undefined && param.nextHop.baseString != undefined) console.log('\nNextHop BaseString::: \n' + param.nextHop.baseString);    
+
+            if (param.signature != undefined) console.log('\nAuthorization Token::: \n' + param.signature);    
+        
+            console.log("\nURL:::");
+            console.log(param.invokeUrl);
+
+            if (param.responseBody != undefined || param.responseText != undefined) console.log("\nResponse:::");
+            if (param.responseBody != undefined) console.log(JSON.stringify(param.responseBody, null, 4));
+            if (param.responseText != undefined) console.log("TEXT:::" + param.responseText);
+
+            if (param.verifyMessage != undefined) console.log(param.verifyMessage);
+        }
+
+        if (param.testPassed != undefined && param.testPassed) {
+            passedTest++;
+
+            if(!param.suppressMessage) {
+                if(param.debug) console.log();
+                if (param.negativeTest != undefined && param.negativeTest) {
+
+                    if (param.testErrorMessage != undefined && param.testErrorMessage == param.error.message) {
+                        console.log(">>> " + param.id + ". " + param.description + " <<< - Negative Test Success.\n" + param.error.message + "\n");
+                    } else {
+                        passedTest--;
+                        console.log(">>> " + param.id + ". " + param.description + " <<< - Negative Test Failed.\nExpecting Error:::" + param.testErrorMessage + "\n        But Get:::" + param.error.message + "\n");
+                    }
+                } else {
+                    console.log(">>> " + param.id + ". " + param.description + " <<< - Success.");
+                }
+            }
+        } else {
+            if(param.debug) console.log();
+            console.log(">>> " + param.id + ". " + param.description + " <<< - Failed. " + param.error.message);
+            if(param.debug) console.log(param.error);
+
+            if (param.error != undefined && param.error.response != undefined) {
+                console.log("   >>> statusCode::: " + param.error.response.statusCode);
+                console.log("   >>> clientError::: " + param.error.response.clientError);
+                console.log("   >>> serverError::: " + param.error.response.serverError);
+        
+                console.log("=== errorText::: ===");
+                console.log(param.error.response.error.text);
+                console.log("=== errorText::: ===");
+            }
+        }
+        if (param.showElapseTime) console.log("\n" + getElapseTime(param.startTime, param.timespan));
+
+        //console.log("^^^^^^^^^^^");
+        //console.log("=== finally... ===");
+    });    
+}
+
 util.performTestGatewaySecurity = (param, verifyFunction) => {
     // propagate default params
-    propergateDefaultParam(param);
+    propagateDefaultValue(param);
 
     if (param.skipTest != undefined && param.skipTest) {
         return Promise.resolve();
@@ -495,16 +626,16 @@ util.performTestGatewaySecurity = (param, verifyFunction) => {
     var debug = _debug;
     if (param.debug != undefined && param.debug) debug = true;
 
-    if (debug) console.log("\n>>> " + param.id + ". " + param.description + " <<< - Start.");
+    //if (debug) console.log("\n>>> " + param.id + ". " + param.description + " <<< - Start.");
 
     // validate parameters here...
     if (param.formData != undefined && Array.isArray(param.formData)) {
         //throw Error("Property 'formData' cannot be an array. \nparam::" + JSON.stringify(param));
-        return Promise.reject("\n>>> " + param.id + ". " + param.description + "<<< Property 'formData' cannot be an array.\nparam::::" + JSON.stringify(param));
+        return Promise.reject("\n>>> " + param.id + ". " + param.description + "<<< Property 'formData' cannot be an array.\nparam:::\n" + JSON.stringify(param, null, 4));
     }
     if (param.queryString != undefined && Array.isArray(param.queryString)) {
         //throw Error("Property 'queryString' cannot be an array. param::" + JSON.stringify(param));
-        return Promise.reject("\n>>> " + param.id + ". " + param.description + "<<< Property 'queryString' cannot be an array.\nparam:::" + JSON.stringify(param));
+        return Promise.reject("\n>>> " + param.id + ". " + param.description + "<<< Property 'queryString' cannot be an array.\nparam:::\n" + JSON.stringify(param, null, 4));
     }
 
     try {
@@ -515,74 +646,126 @@ util.performTestGatewaySecurity = (param, verifyFunction) => {
     }
     
     return util.invokeRequest(param).then(function(res){
-        var data = {};
+        //var data = {};
 
         if (!_.isEmpty(res.body))
-            data = res.body;
+            param.responseBody = res.body;
         else
-            data = res.text;
+            param.responseText = res.text;
 
-        if (debug) console.log("\nResponse:::");
-        if (debug && !_.isEmpty(res.body)) console.log(JSON.stringify(data));
-        if (debug && _.isEmpty(res.body)) console.log("TEXT:::" + res.text);
+        //if (debug) console.log("\nResponse:::");
+        //if (debug && !_.isEmpty(res.body)) console.log(JSON.stringify(data));
+        //if (debug && _.isEmpty(res.body)) console.log("TEXT:::" + res.text);
 
-        if (debug) console.log("\nURL:::");
-        if (debug) console.log(param.invokeUrl);
+        //if (debug) console.log("\nURL:::");
+        //if (debug) console.log(param.invokeUrl);
 
         if (verifyFunction != undefined || param.verifyFunction != undefined) {
             if (param.verifyFunction != undefined) {
                 // execute verification function from parameters
-                util[param.verifyFunction](param, res).then(verifyResult => { if (verifyResult) passedTest++; });
+                //util[param.verifyFunction](param, res).then(verifyResult => { if (verifyResult) passedTest++; });
+                util[param.verifyFunction](param, res).then(testResult => { param.testPassed = testResult; });
             } else {
                 // execute verification function from call
-                verifyFunction(param, res).then(verifyResult => { if (verifyResult) passedTest++; });
+                //verifyFunction(param, res).then(verifyResult => { if (verifyResult) passedTest++; });
+                verifyFunction(param, res).then(testResult => { param.testPassed = testResult; });
             }
         } else {
             // test pass
-            passedTest++;
+            // passedTest++;
+            param.testPassed = true;
 
-            if (debug) console.log("\n");
-            if(!param.suppressMessage) {
-                console.log(">>> " + param.id + ". " + param.description + " <<< - Success.");
-                if (param.showElapseTime) console.log(getElapseTime(param.startTime, param.timespan));
-            }
+            //if (debug) console.log("\n");
+            //if(!param.suppressMessage) {
+                //console.log(">>> " + param.id + ". " + param.description + " <<< - Success.");
+                //if (param.showElapseTime) console.log(getElapseTime(param.startTime, param.timespan));
+            //}
         }
     }).catch(function(error) { 
-        if (debug) {
-            console.log("\n");
-            console.log("HTTP Call Failed..." + error);
-            console.log("\n");
-        }
+        //if (debug) {
+            //console.log("\n");
+            //console.log("HTTP Call Failed..." + error);
+            //console.log("\n");
+        //}
 
+        param.error = error;
         if (param.negativeTest != undefined && param.negativeTest){
-            passedTest++;
+            param.testPassed = true;
 
-            if(!param.suppressMessage) {
-                console.log(">>> " + param.id + ". " + param.description + " <<< - Negative Test Success.\n" + error + "\n");
-                if (param.showElapseTime) console.log(getElapseTime(param.startTime, param.timespan));
-            }
+            //if(!param.suppressMessage) {
+                //console.log(">>> " + param.id + ". " + param.description + " <<< - Negative Test Success.\n" + error + "\n");
+                //if (param.showElapseTime) console.log(getElapseTime(param.startTime, param.timespan));
+            //}
         } else {
-            console.log();
-            console.log(">>> " + param.id + ". " + param.description + " <<< - Failed. " + error);
+            //console.log();
+            //console.log(">>> " + param.id + ". " + param.description + " <<< - Failed. " + error);
 
-            if (error.response != undefined) {
-                console.log(">>> statusCode::: " + error.response.statusCode);
-                console.log(">>> clientError::: " + error.response.clientError);
-                console.log(">>> serverError::: " + error.response.serverError);
+            //if (error.response != undefined) {
+                //console.log(">>> statusCode::: " + error.response.statusCode);
+                //console.log(">>> clientError::: " + error.response.clientError);
+                //console.log(">>> serverError::: " + error.response.serverError);
         
-                console.log("=== errorText::: ===");
-                console.log(error.response.error.text);
-                console.log("=== errorText::: ===");
-            }
+                //console.log("=== errorText::: ===");
+                //console.log(error.response.error.text);
+                //console.log("=== errorText::: ===");
+            //}
 
-            console.log("\nURL:::");
-            console.log(param.invokeUrl);
+            //console.log("\nURL:::");
+            ///console.log(param.invokeUrl);
             
-            if (param.showElapseTime) console.log("\n" + getElapseTime(param.startTime, param.timespan));
+            //if (param.showElapseTime) console.log("\n" + getElapseTime(param.startTime, param.timespan));
             //console.log(">>> " + "URL: " + param.invokeUrl);
             //console.log(">>> " + "Param: " + JSON.stringify(param));
             //console.log();
         }
+    }).finally( () => {
+        console.log();
+        console.log(">>> finally... <<<");
+        console.log("~~~~~~~~~~~");
+        if (param.debug) {
+            console.log(">>> " + param.id + ". " + param.description + " <<< - Start.");
+
+            if (param.baseString != undefined) console.log('\nBaseString::: \n' + param.baseString);    
+            if (param.nextHop != undefined && param.nextHop.baseString != undefined) console.log('\nNextHop BaseString::: \n' + param.nextHop.baseString);    
+
+            if (param.signature != undefined) console.log('\nAuthorization Token::: \n' + param.signature);    
+        
+            console.log("\nURL:::");
+            console.log(param.invokeUrl);
+
+            if (param.responseBody != undefined || param.responseText != undefined) console.log("\nResponse:::");
+            if (param.responseBody != undefined) console.log(JSON.stringify(param.responseBody));
+            if (param.responseText != undefined) console.log("TEXT:::" + param.responseText);
+        }
+
+        if (param.testPassed != undefined && param.testPassed) {
+            passedTest++;
+
+            if(!param.suppressMessage) {
+                if(param.debug) console.log();
+                if (param.negativeTest != undefined && param.negativeTest)
+                    console.log(">>> " + param.id + ". " + param.description + " <<< - Negative Test Success.\n" + param.error + "\n");
+                else
+                    console.log(">>> " + param.id + ". " + param.description + " <<< - Success.");
+            }
+        } else {
+            console.log();
+            console.log(">>> " + param.id + ". " + param.description + " <<< - Failed. " + param.error);
+
+            if (param.error.response != undefined) {
+                console.log("   >>> statusCode::: " + param.error.response.statusCode);
+                console.log("   >>> clientError::: " + param.error.response.clientError);
+                console.log("   >>> serverError::: " + param.error.response.serverError);
+        
+                console.log("=== errorText::: ===");
+                console.log(param.error.response.error.text);
+                console.log("=== errorText::: ===");
+            }
+        }
+        if (param.showElapseTime) console.log("\n" + getElapseTime(param.startTime, param.timespan));
+
+        console.log("^^^^^^^^^^^");
+        console.log("=== finally... ===");
     });    
 }
 
@@ -602,7 +785,7 @@ function getElapseTime(startDate, ts) {
     } else {
         message += "Elapse Time: " + (ts.totalHours()|0) + " hours " + ts.minutes + " minutes " + ts.seconds + " seconds " + ts.milliseconds + " milliseconds";
     }
-    message += "\n";
+    //message += "\n";
 
     return message;
 }

@@ -1,30 +1,31 @@
 "use strict" 
 
 const helper = require('./../index').apiHelper;
+const joseVerify = require('./joseVerify');
 
-const customVerifyJws = require('./customVerifyJws').customVerifyJws;
-const customVerifyJwe = require('./customVerifyJwe').customVerifyJwe;
-const customVerifyJweJws = require('./customVerifyJwe').customVerifyJweJws;
-
-let params = require('./json/sample.json');
+let params_sample = require('./sample.json');
+let params_security = require('./sample.security.json');
 
 // register verification function with helper library
 // this supports verification function for each call
 // default implementation
-//helper.myVerifyJws = helper.verifyJws;
-//helper.myVerifyJwe = helper.verifyJwe;
-// custom implementation
-helper.myVerifyJws = customVerifyJws;
-helper.myVerifyJwe = customVerifyJwe;
-helper.myVerifyJweJws = customVerifyJweJws;
+helper.myVerifyJws = joseVerify.verifyJws;
+helper.myVerifyJwe = joseVerify.verifyJwe;
+helper.myVerifyJweJws = joseVerify.verifyJweJws;
 
 // to suppress the successfult message, will not suppress error message
-helper.setDefaultParam({ suppressMessage: false, debug : false, showElapseTime: false });
+helper.setDefaultParam({ 
+    suppressMessage: false, 
+    debug : false, 
+    showElapseTime: false,
+    skipTest: false
+});
 
 Promise.resolve()
     .then(function() { return helper.startTestTimer() })
 
-    .then(function() { return helper.performTest(params) })
+    .then(function() { return helper.performTest(params_sample) })
+    .then(function() { return helper.performTest(params_security) })
 
     .then(helper.displayTestResult).then(message => console.log("\n" + message))
     .then(helper.displayElapseTime).then(message => console.log("\n" + message + "\n"))
