@@ -311,17 +311,12 @@ util.setDefaultParam = (defaultValue) => {
     defaultParam = defaultValue;
 }
 
-// TODO: to support more default properties...
 function propagateDefaultValue(param) {
     if (defaultParam == undefined) return;
 
-    if (param.suppressMessage == undefined && defaultParam.suppressMessage != undefined) param.suppressMessage = defaultParam.suppressMessage;
-    if (param.debug == undefined && defaultParam.debug != undefined) param.debug = defaultParam.debug;
-
-    if (param.showElapseTime == undefined && defaultParam.showElapseTime != undefined) param.showElapseTime = defaultParam.showElapseTime;
-    if (param.skipTest == undefined && defaultParam.skipTest != undefined) param.skipTest = defaultParam.skipTest;
-    
-    return;
+    for (let key in defaultParam) {
+        if (param[key] == undefined) param[key] = defaultParam[key];
+    }
 }
 
 util.executeTest = (param) => {
