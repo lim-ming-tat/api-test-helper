@@ -105,7 +105,7 @@
             "realm" : "http://node.js.test.l2.ig",
             "appId" : "ig.app.name",
             
-            "signatureUrl" : "https://www.e.example.com",
+            "signatureUrl" : "https://www.i.example.org",
             "httpMethod" : "GET",
     
             "privateCertFileName" : "./certs/private.key.pem",
@@ -130,6 +130,33 @@
         "privateCertFileType" : "pem"
     },
     {
+        "id" : "L21",
+        "description" : "Gateway Security Parameter (L21) Template.",
+
+        "authPrefix": "apex_l2_eg",
+        "realm" : "http://node.js.test.l21.eg",
+        "appId" : "eg.app.name",
+        
+        "invokeUrl" : "https://www.example.com",
+        "signatureUrl" : "https://www.e.example.com",
+        "httpMethod" : "GET",
+        
+        "queryString" : { "clientname" : "node.js.test.l2", "data" : "some data value" },
+
+        "privateCertFileName" : "./certs/private.key.pem",
+        "privateCertFileType" : "pem",
+
+        "nextHop" : {
+            "authPrefix": "apex_l1_ig",
+            "realm" : "http://node.js.test.l1.ig",
+            "appId" : "ig.app.name",
+            "secret" : "ig.l1.secret",
+            
+            "signatureUrl" : "https://www.i.example.org",
+            "httpMethod" : "GET"
+        }
+    },
+    {
         "id" : "L22",
         "description" : "Gateway Security Parameter (L22) Template.",
 
@@ -151,7 +178,7 @@
             "realm" : "http://node.js.test.l2.ig",
             "appId" : "ig.app.name",
             
-            "signatureUrl" : "https://www.e.example.com",
+            "signatureUrl" : "https://www.i.example.org",
             "httpMethod" : "GET",
     
             "privateCertFileName" : "./certs/private.key.pem",

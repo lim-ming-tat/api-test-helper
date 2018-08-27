@@ -43,7 +43,8 @@ util.invokeRequest = (param) => {
         req.buffer(true);
 
         if (param.caCertFileName != undefined){
-            req.ca(fs.readFileSync(param.caCertFileName, "utf8"));
+            //req.ca(fs.readFileSync(param.caCertFileName, "utf8"));
+            req.ca(fs.readFileSync(param.caCertFileName));
         }
 
         if (param.signature != undefined && param.signature.length > 0) {
@@ -220,7 +221,7 @@ util.performTest = (params, verifyFunction) => {
         }
     ));
 }
-
+/*
 util.verifyJws = (param, response) => {
     var debug = _debug;
     if (param.debug != undefined && param.debug) debug = true;
@@ -373,7 +374,8 @@ util.verifyJwe = (param, response) => {
                 });
         });
 }
-
+*/
+/*
 util.displayExecutionTime = (param, response) => { return Promise.resolve().then( function() {
     //console.log(":::" + param.startTime.format());
     //console.log(":::" + param.timespan.endDate.format());
@@ -383,7 +385,7 @@ util.displayExecutionTime = (param, response) => { return Promise.resolve().then
 
     return true;
 } ) };
-
+*/
 util.displayTestResult = () => {
     return Promise.resolve("Test Results::: " + passedTest + "/" + totalTest + "\n   Skip Test::: " + skipTest);
 }
@@ -417,8 +419,6 @@ function showBaseString(param) {
         nonce: param.nonce || "nonce",
         timestamp: param.timestamp || "timestamp"
     };
-    //let baseString = apex.getSignatureBaseString(baseProps);
-    //console.log('\nBaseString::: \n\"' + baseString + "\"\n");
 
     param.baseString = apex.getSignatureBaseString(baseProps);
 }
@@ -439,12 +439,10 @@ util.getApexSecurityToken = (param) => {
 
         param.signature = apex.getSignatureToken(param);
 
-        //console.log('\n\n1. Signature::: ' + param.signature);
         if (param.debug) showBaseString(param);
     }
 
     if (param.nextHop != undefined && param.nextHop.signatureUrl != undefined) {
-        //console.log('\n\n2. Signature::: ' + param.queryString);
         param.nextHop.queryString = param.queryString;
 
         // propergate old peroperty...
@@ -458,10 +456,8 @@ util.getApexSecurityToken = (param) => {
         // set signatureMethod
         param.nextHop.signatureMethod = _.isNil(param.secret) ? 'SHA256withRSA' : 'HMACSHA256';
 
-        //console.log('\n\n3. Signature::: ' + JSON.stringify(param.nextHop));
         let childToken = apex.getSignatureToken(param.nextHop);
 
-        //console.log('\n\n4. NextHop Signature::: ' + childToken);
         if (param.debug) showBaseString(param.nextHop);
 
         if (childToken != null) {
@@ -472,8 +468,6 @@ util.getApexSecurityToken = (param) => {
             }
         }
     }
-
-    //if (param.debug && param.signature != undefined) console.log('\nSignature::: \n' + param.signature);    
 }
 
 var defaultParam = undefined;
@@ -495,7 +489,6 @@ function propagateDefaultValue(param) {
 }
 
 util.executeTest = (param) => {
-    //console.log("executeTest:::");
     return new promise(function(resolve, reject){
         // propagate default params
         propagateDefaultValue(param);
@@ -519,10 +512,7 @@ util.executeTest = (param) => {
         // get the authorization token
         util.getApexSecurityToken(param);
 
-        return util.invokeRequest(param).then(function(res){
-            //console.log("response.type:::" + res.type);
-            //console.log("response.type:::" + typeis(res.type, ['application/json']));
-
+        return util.invokeRequest(param).then(function(res) {
             if (!_.isEmpty(res.body))
                 param.responseBody = res.body;
             else
@@ -547,9 +537,6 @@ util.executeTest = (param) => {
     }).catch(function(error) {
         param.error = error;
     }).finally( () => {
-        //console.log();
-        //console.log(">>><<< finally... >>><<<");
-        //console.log("~~~~~~~~~~~");
         if (param.skipTest != undefined && param.skipTest) {
             skipTest++;
             return;
@@ -580,11 +567,11 @@ util.executeTest = (param) => {
                 if(param.debug) console.log();
                 if (param.negativeTest != undefined && param.negativeTest) {
 
-                    if (param.testErrorMessage != undefined && param.testErrorMessage == param.error.message) {
+                    if (param.testErrorMessage != undefined && param.testErrorMessage == ((param.error) ? param.error.message : '')) {
                         console.log(">>> " + param.id + ". " + param.description + " <<< - Negative Test Success.\n" + param.error.message + "\n");
                     } else {
                         passedTest--;
-                        console.log(">>> " + param.id + ". " + param.description + " <<< - Negative Test Failed.\nExpecting Error:::" + param.testErrorMessage + "\n        But Get:::" + param.error.message + "\n");
+                        console.log(">>> " + param.id + ". " + param.description + " <<< - Negative Test Failed.\nExpecting Error:::" + param.testErrorMessage + "\n        But Get:::" + ((param.error) ? param.error.message : '') + "\n");
                     }
                 } else {
                     console.log(">>> " + param.id + ". " + param.description + " <<< - Success.");
@@ -606,12 +593,9 @@ util.executeTest = (param) => {
             }
         }
         if (param.showElapseTime) console.log("\n" + getElapseTime(param.startTime, param.timespan));
-
-        //console.log("^^^^^^^^^^^");
-        //console.log("=== finally... ===");
     });    
 }
-
+/*
 util.performTestGatewaySecurity = (param, verifyFunction) => {
     // propagate default params
     propagateDefaultValue(param);
@@ -768,7 +752,7 @@ util.performTestGatewaySecurity = (param, verifyFunction) => {
         console.log("=== finally... ===");
     });    
 }
-
+*/
 function getElapseTime(startDate, ts) {
     var message = "";
     if (startDate == undefined || ts == undefined) return message;
@@ -785,8 +769,6 @@ function getElapseTime(startDate, ts) {
     } else {
         message += "Elapse Time: " + (ts.totalHours()|0) + " hours " + ts.minutes + " minutes " + ts.seconds + " seconds " + ts.milliseconds + " milliseconds";
     }
-    //message += "\n";
-
     return message;
 }
 

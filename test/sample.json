@@ -37,11 +37,11 @@
         "id" : "003.3",
         "description" : "Parameters Template. Ignore server certificate(SSL) flag. <<<\n>>> By default 'ignoreServerCert' flag is set to 'True'.<<<\n>>>",
 
-        "invokeUrl" : "https://ssl1.sherlock-aws.ai/api/helloworld",
+        "invokeUrl" : "https://www.google.com",
 
         "ignoreServerCert" : false,
-        "caCertFileName" : "./certs/NECTAR-CA.pem",
-        "caCertFileType" : "pem"
+        "caCertFileName" : "./certs/GlobalSign.pem",
+        "caCertFileType" : "x509"
     },
     {
         "id" : "004.1",
