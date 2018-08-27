@@ -17,7 +17,7 @@ helper.setDefaultParam({
     // suppress the successful message, will not suppress error message is any
     suppressMessage: false,
     // display verbose debug message
-    debug : false,
+    debug: false,
     // show execution time
     showElapseTime: false,
     // skip a test

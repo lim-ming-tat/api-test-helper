@@ -3,7 +3,6 @@
 const crypto = require('crypto');
 const request = require('superagent');
 const fs = require('fs');
-//const jose = require('node-jose');
 const promise = require('bluebird');
 const qs = require('querystring');
 const { URL } = require('url');
@@ -12,8 +11,6 @@ const _ = require("lodash");
 
 const apex = require('node-apex-api-security').ApiSigningUtil;
 const dateFormat = require('./timestamp').dateFormat;
-
-//var _debug = false;
 
 var totalTest = 0;
 var passedTest = 0;
@@ -135,10 +132,9 @@ util.invokeRequest = (param) => {
     });
 }
 
-util.performTest = (params, verifyFunction) => {
+util.performTest = (params) => {
     //console.log( "Entering recursive function for [", params.length, "]." );
     
-    //var testFunction = util.performTestGatewaySecurity;
     var testFunction = util.executeTest;
 
     // Once we hit zero, bail out of the recursion. The key to recursion is that
@@ -177,7 +173,7 @@ util.performTest = (params, verifyFunction) => {
             newItem.queryString.llid = require('uuid/v1')().substring(0,8);
             newItem.description += " llid=" + newItem.queryString.llid;
 
-            functionArray.push(util.performTest(newItem, verifyFunction));
+            functionArray.push(util.performTest(newItem));
         }
 
         tangentialPromiseBranch = Promise.all(functionArray);
@@ -211,13 +207,12 @@ util.performTest = (params, verifyFunction) => {
             newParams = _.concat(repeatedParam, newParams);
         }
 
-        //tangentialPromiseBranch = testFunction(item, verifyFunction);
         tangentialPromiseBranch = testFunction(item);
     }
 
     return(tangentialPromiseBranch.then(
         function() {
-            return( util.performTest( newParams, verifyFunction ) ); // RECURSE!
+            return(util.performTest(newParams)); // RECURSE!
         }
     ));
 }
@@ -281,7 +276,7 @@ util.getApexSecurityToken = (param) => {
     if (param.nextHop != undefined && param.nextHop.signatureUrl != undefined) {
         param.nextHop.queryString = param.queryString;
 
-        // propergate old peroperty...
+        // propagate old peroperty...
         param.nextHop.urlPath = param.nextHop.signatureUrl;
         param.nextHop.certFileName = param.nextHop.privateCertFileName;
 
