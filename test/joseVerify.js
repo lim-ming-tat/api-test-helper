@@ -56,16 +56,16 @@ function verifyJws(param, response) {
 // response - http response object
 function verifyJwe(param, response) {
     param.verifyJweJws = false;
-    return customVerifyJose(param, response);
+    return verifyJose(param, response);
 }
 
 function verifyJweJws(param, response) {
     param.verifyJweJws = true;
-    return customVerifyJose(param, response);
+    return verifyJose(param, response);
 }
 
 // response - http response object
-function customVerifyJose(param, response) {
+function verifyJose(param, response) {
     var data = {};
 
     // convert compact to JSON
