@@ -241,7 +241,8 @@ function showBaseString(param) {
     // get baseString
     let baseProps = {
         authPrefix: param.authPrefix.toLowerCase(),
-        signatureMethod: param.signatureMethod || "signatureMethod",
+        //signatureMethod: param.signatureMethod || "signatureMethod",
+        signatureMethod: param.signatureMethod || _.isNil(param.secret) ? 'SHA256withRSA' : 'HMACSHA256',
         appId: param.appId,
         urlPath: param.signatureUrl,
         httpMethod: param.httpMethod,
@@ -266,7 +267,7 @@ util.getApexSecurityToken = (param) => {
         param.timestamp = param.timestamp || (new Date).getTime();
 
         // set signatureMethod
-        param.signatureMethod = _.isNil(param.secret) ? 'SHA256withRSA' : 'HMACSHA256';
+        //param.signatureMethod = _.isNil(param.secret) ? 'SHA256withRSA' : 'HMACSHA256';
 
         param.signature = apex.getSignatureToken(param);
 
@@ -274,7 +275,9 @@ util.getApexSecurityToken = (param) => {
     }
 
     if (param.nextHop != undefined && param.nextHop.signatureUrl != undefined) {
+        // propagate queryString and formData to nextHop...
         param.nextHop.queryString = param.queryString;
+        param.nextHop.formData = param.formData;
 
         // propagate old peroperty...
         param.nextHop.urlPath = param.nextHop.signatureUrl;
@@ -285,7 +288,7 @@ util.getApexSecurityToken = (param) => {
         param.nextHop.timestamp = param.nextHop.timestamp || (new Date).getTime();
 
         // set signatureMethod
-        param.nextHop.signatureMethod = _.isNil(param.secret) ? 'SHA256withRSA' : 'HMACSHA256';
+        //param.nextHop.signatureMethod = _.isNil(param.secret) ? 'SHA256withRSA' : 'HMACSHA256';
 
         let childToken = apex.getSignatureToken(param.nextHop);
 
@@ -404,21 +407,29 @@ util.executeTest = (param) => {
                 }
             }
         } else {
-            if(param.debug) console.log();
+            if (param.debug) console.log();
+            if (!param.debug) {
+                console.log(">>> " + param.id + ". " + param.description + " <<< - Start.");
+                console.log("\nURL:::");
+                console.log(param.invokeUrl);
+                console.log();
+            }
             console.log(">>> " + param.id + ". " + param.description + " <<< - Failed. " + param.error.message);
-            if(param.debug) console.log(param.error);
 
             if (param.error != undefined && param.error.response != undefined) {
                 console.log("   >>> statusCode::: " + param.error.response.statusCode);
                 console.log("   >>> clientError::: " + param.error.response.clientError);
                 console.log("   >>> serverError::: " + param.error.response.serverError);
-        
+                
+                if(param.debug) console.log(param.error);
+
                 console.log("=== errorText::: ===");
                 console.log(param.error.response.error.text);
                 console.log("=== errorText::: ===");
             }
         }
         if (param.showElapseTime) console.log("\n" + getElapseTime(param.startTime, param.timespan));
+        if (param.debug) console.log(">>> " + param.id + ". " + param.description + " <<< - END.");
     });    
 }
 
