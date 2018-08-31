@@ -32,7 +32,7 @@ util.invokeRequest = (param) => {
 
         // construct query string
         if (param.queryString != undefined) {
-            targetURL.search = qs.stringify(param.queryString, null, null, {encodeURIComponent: decodeURIComponent}) + targetURL.search.replace('?', '&');
+            targetURL.search = qs.stringify(param.queryString, null, null, {encodeURIComponent: encodeURIComponent}) + targetURL.search.replace('?', '&');
         }
 
         let req = request(param.httpMethod, targetURL.href);
@@ -56,7 +56,7 @@ util.invokeRequest = (param) => {
         }
 
         if ((param.httpMethod == "POST" || param.httpMethod == "PUT") && param.formData != undefined) {
-            let postData = qs.stringify(param.formData, null, null, {encodeURIComponent: decodeURIComponent});
+            let postData = qs.stringify(param.formData, null, null, {encodeURIComponent: encodeURIComponent});
             req = req.type("application/x-www-form-urlencoded").set("Content-Length", Buffer.byteLength(postData)).send(postData);
         }
 
