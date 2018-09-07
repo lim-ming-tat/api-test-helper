@@ -48,6 +48,10 @@ util.invokeRequest = (param) => {
             req = req.set("Authorization", param.signature);
         }
 
+        if (param.testTag != undefined && param.testTag) {
+            req = req.set("NODE-Test-Tag", param.id + ". " + param.description);
+        }
+    
         if (param.httpHeaders != undefined) {
             // Iterate through properties of headers
             for (let key in param.httpHeaders) {

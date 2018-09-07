@@ -1,5 +1,6 @@
 # custom test folders
 samples/
+cert/
 
 # Logs
 logs
