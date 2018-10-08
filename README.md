@@ -2,6 +2,11 @@
 Helper Library to test API
 
 1. Create a new node js project in a new folder.
+```text
+mkdir newProject
+cd newProject
+npm init
+```
 
 2. Get the test helper package.
 ```text
