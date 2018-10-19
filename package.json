@@ -9,8 +9,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bluebird": "^3.5.2",
     "node-apex-api-security": "github:GovTechSG/node-apex-api-security",
     "node-jose": "^0.11.0",
+    "superagent": "^4.0.0-beta.5",
     "timespan": "^2.3.0"
   }
 }
