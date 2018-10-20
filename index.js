@@ -174,6 +174,7 @@ util.performTest = (params) => {
 
             if (newItem.queryString == undefined) newItem.queryString = {};
 
+            newItem.id += " parallel=" + i;
             newItem.queryString.llid = require('uuid/v1')().substring(0,8);
             newItem.description += " llid=" + newItem.queryString.llid;
 
@@ -194,6 +195,7 @@ util.performTest = (params) => {
 
             var stringCopy = JSON.stringify(item);
 
+            item.id += " repeat=1";
             item.queryString.uuid = require('uuid/v1')().substring(0,8);
             item.description += " uuid=" + item.queryString.uuid;
 
@@ -205,8 +207,13 @@ util.performTest = (params) => {
                 repeatedParam = JSON.parse('[' + (stringCopy + ',').repeat(repeats) + stringCopy + ']');
             }
 
+            var repeatCounter = 1;
+
             // assign uuid to the rest
-            _.forEach(repeatedParam, function(param) { param.queryString.uuid = require('uuid/v1')().substring(0,8); param.description += " uuid=" + param.queryString.uuid; });
+            _.forEach(repeatedParam, function(param) {
+                param.id += " repeat=" + ++repeatCounter;
+                param.queryString.uuid = require('uuid/v1')().substring(0,8); param.description += " uuid=" + param.queryString.uuid; 
+            });
 
             newParams = _.concat(repeatedParam, newParams);
         }
@@ -367,7 +374,12 @@ util.executeTest = (param) => {
                 param.testPassed = true;
             }
         }).finally( () => { return resolve() });
-    }).catch(function(error) {
+    }).then( () => { 
+        if (param.delay == undefined) {
+            param.delay = 0;
+        }
+    }).delay(param.delay)
+    .catch(function(error) {
         param.error = error;
     }).finally( () => {
         if (param.skipTest != undefined && param.skipTest) {
@@ -390,6 +402,8 @@ util.executeTest = (param) => {
             if (param.responseBody != undefined) console.log(JSON.stringify(param.responseBody, null, 4));
             if (param.responseText != undefined) console.log("TEXT:::" + param.responseText);
 
+            if (param.delay > 0) console.log("Execution Delay(Milliseconds):::" + param.delay);
+
             if (param.verifyMessage != undefined) console.log(param.verifyMessage);
         }
 
@@ -409,6 +423,7 @@ util.executeTest = (param) => {
                 } else {
                     console.log(">>> " + param.id + ". " + param.description + " <<< - Success.");
                 }
+                if (param.delay > 0) console.log(">>> Execution Delay(Milliseconds):::" + param.delay);
             }
         } else {
             if (param.debug) console.log();

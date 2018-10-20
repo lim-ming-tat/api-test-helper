@@ -62,6 +62,15 @@
     },
     {
         "id" : "004.3",
+        "description" : "Parameters Template. Execute call multiple times with delay by setting 'repeats' property(integer) and 'delay' property(integer). Each call will be tag with QueryString.",
+
+        "invokeUrl" : "http://www.example.com/",
+
+        "repeats" : 3,
+        "delay" : 1000
+    },
+    {
+        "id" : "004.4",
         "description" : "Parameters Template. Call with QueryString.",
 
         "invokeUrl" : "http://www.example.com/",
@@ -69,7 +78,7 @@
         "queryString" : { "clientname" : "node.js.test", "param1" : "data 1", "param2" : "data 2" }
     },
     {
-        "id" : "004.4",
+        "id" : "004.5",
         "description" : "Parameters Template. Call with Headers.",
 
         "invokeUrl" : "http://www.example.com/",
