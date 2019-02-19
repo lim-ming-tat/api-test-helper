@@ -326,6 +326,16 @@ function propagateDefaultValue(param) {
     for (let key in defaultParam) {
         if (param[key] == undefined) param[key] = defaultParam[key];
     }
+
+    // replace property value with value from sessionData
+    if (param.replaceMaps != undefined) {
+        param.replaceMaps.forEach(item => {
+            var replace = "{{" + item.replaceValue + "}}";
+            var regex = new RegExp(replace, "g");
+
+            _.set(param, item.propertyName, _.get(param, item.propertyName).replace(regex, _.get(param, item.replaceValue)));
+        });
+    }
 }
 
 util.executeTest = (param) => {
