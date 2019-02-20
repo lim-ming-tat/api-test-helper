@@ -320,11 +320,26 @@ util.setDefaultParam = (defaultValue) => {
     defaultParam = defaultValue;
 }
 
+util.displaySessionData = () => {
+    return Promise.resolve("Session Data::: " + JSON.stringify(defaultParam.sessionData, null, 4));
+}
+
 function propagateDefaultValue(param) {
     if (defaultParam == undefined) return;
 
     for (let key in defaultParam) {
         if (param[key] == undefined) param[key] = defaultParam[key];
+    }
+
+    // setup the athhorization header for cm api
+    // prerequisite: 
+    //      param.sessionData.atmoToken
+    //      param.sessionData.csrfToken
+    if (param.setupCmApiHeader) {
+        if (param.httpHeaders == undefined) param.httpHeaders = {};
+
+        if (param.sessionData.atmoToken) param.httpHeaders.cookie = param.sessionData.atmoToken.cookie;
+        if (param.sessionData.csrfToken) param.httpHeaders['X-' + param.sessionData.csrfToken.name] = param.sessionData.csrfToken.token;
     }
 
     // replace property value with value from sessionData
