@@ -345,10 +345,14 @@ function propagateDefaultValue(param) {
     // replace property value with value from sessionData
     if (param.replaceMaps != undefined) {
         param.replaceMaps.forEach(item => {
-            var replace = "{{" + item.replaceValue + "}}";
-            var regex = new RegExp(replace, "g");
+            if (typeof _.get(param, item.propertyName) == "string") {
+                var replace = "{{" + item.replaceValue + "}}";
+                var regex = new RegExp(replace, "g");
 
-            _.set(param, item.propertyName, _.get(param, item.propertyName).replace(regex, _.get(param, item.replaceValue)));
+                _.set(param, item.propertyName, _.get(param, item.propertyName).replace(regex, _.get(param, item.replaceValue)));
+            } else {
+                _.set(param, item.propertyName, _.get(param, item.replaceValue));
+            }
         });
     }
 }
