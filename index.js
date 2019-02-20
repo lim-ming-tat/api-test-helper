@@ -320,6 +320,10 @@ util.setDefaultParam = (defaultValue) => {
     defaultParam = defaultValue;
 }
 
+util.getDefaultParam = () => {
+    return defaultParam;
+}
+
 util.displaySessionData = () => {
     return Promise.resolve("Session Data::: " + JSON.stringify(defaultParam.sessionData, null, 4));
 }
