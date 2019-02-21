@@ -137,6 +137,12 @@ util.invokeRequest = (param) => {
 }
 
 util.performTest = (params) => {
+    var cloneParams = JSON.parse(JSON.stringify(params));
+
+    return util.performTestRecursive(cloneParams);
+}
+
+util.performTestRecursive = (params) => {
     //console.log( "Entering recursive function for [", params.length, "]." );
     
     var testFunction = util.executeTest;
@@ -178,7 +184,7 @@ util.performTest = (params) => {
             newItem.queryString.llid = require('uuid/v1')().substring(0,8);
             newItem.description += " llid=" + newItem.queryString.llid;
 
-            functionArray.push(util.performTest(newItem));
+            functionArray.push(util.performTestRecursive(newItem));
         }
 
         tangentialPromiseBranch = Promise.all(functionArray);
@@ -223,7 +229,7 @@ util.performTest = (params) => {
 
     return(tangentialPromiseBranch.then(
         function() {
-            return(util.performTest(newParams)); // RECURSE!
+            return(util.performTestRecursive(newParams)); // RECURSE!
         }
     ));
 }
