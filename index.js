@@ -414,6 +414,11 @@ util.executeTest = (param) => {
             }
         }).finally( () => { return resolve() });
     }).then( () => { 
+        if (param.postInvoke != undefined) {
+            // execute postInvoke function from parameters
+            return util[param.postInvoke](param);
+        }
+    }).then( () => { 
         if (param.delay == undefined) {
             param.delay = 0;
         }
@@ -435,7 +440,8 @@ util.executeTest = (param) => {
             if (param.signature != undefined) console.log('\nAuthorization Token::: \n' + param.signature);    
         
             console.log("\nURL:::");
-            console.log(param.invokeUrl);
+            //console.log(param.invokeUrl);
+            console.log("\x1b[33m%s\x1b[0m", param.invokeUrl);
 
             if (param.responseBody != undefined || param.responseText != undefined) console.log("\nResponse:::");
             if (param.responseBody != undefined) console.log(JSON.stringify(param.responseBody, null, 4));
@@ -469,10 +475,20 @@ util.executeTest = (param) => {
             if (!param.debug) {
                 console.log(">>> " + param.id + ". " + param.description + " <<< - Start.");
                 console.log("\nURL:::");
-                console.log(param.invokeUrl);
+                //console.log(param.invokeUrl);
+                //console.log("\x1b[30m%s\x1b[0m", param.invokeUrl);
+                //console.log("\x1b[31m%s\x1b[0m", param.invokeUrl);
+                //console.log("\x1b[32m%s\x1b[0m", param.invokeUrl);
+                console.log("\x1b[33m%s\x1b[0m", param.invokeUrl);
+                //console.log("\x1b[34m%s\x1b[0m", param.invokeUrl);
+                //console.log("\x1b[35m%s\x1b[0m", param.invokeUrl);
+                //console.log("\x1b[36m%s\x1b[0m", param.invokeUrl);
+                //console.log("\x1b[37m%s\x1b[0m", param.invokeUrl);
+                //console.log("\x1b[38m%s\x1b[0m", param.invokeUrl);
                 console.log();
             }
-            console.log(">>> " + param.id + ". " + param.description + " <<< - Failed. " + param.error.message);
+            //console.log(">>> " + param.id + ". " + param.description + " <<< - Failed. " + param.error.message);
+            console.log("%s \x1b[33m%s\x1b[0m", ">>> " + param.id + ". " + param.description + " <<< - Failed.", param.error.message);
 
             if (param.error != undefined && param.error.response != undefined) {
                 console.log("   >>> statusCode::: " + param.error.response.statusCode);
