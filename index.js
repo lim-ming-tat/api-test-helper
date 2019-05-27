@@ -479,7 +479,7 @@ util.executeTest = (param) => {
                 console.log();
             }
             //console.log(">>> " + param.id + ". " + param.description + " <<< - Failed. " + param.error.message);
-            console.log(">>> " + param.id + ". " + param.description + " <<< - Failed. " + setColor.info(param.error.message));
+            console.log(">>> " + param.id + ". " + param.description + " <<< - Failed. " + setColor.warn(param.error.message));
 
             if (param.error != undefined && param.error.response != undefined) {
                 console.log("   >>> statusCode::: " + param.error.response.statusCode);
