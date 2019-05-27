@@ -340,7 +340,9 @@ function propagateDefaultValue(param) {
     for (let key in defaultParam) {
         if (param[key] == undefined) param[key] = defaultParam[key];
     }
+}
 
+function applyReplaceMaps(param) {
     // setup the athhorization header for cm api
     // prerequisite: 
     //      param.sessionData.atmoToken
@@ -369,17 +371,19 @@ function propagateDefaultValue(param) {
 
 util.executeTest = (param) => {
     return new promise(function(resolve, reject){
-        if (param.preHttpRequest != undefined) {
-            // execute pre Http Request function from parameters
-            util[param.preHttpRequest](param);
-        }
-
         // propagate default params
         propagateDefaultValue(param);
 
         if (param.skipTest != undefined && param.skipTest) {
             return resolve();
         }
+
+        if (param.preHttpRequest != undefined) {
+            // execute pre Http Request function from parameters
+            util[param.preHttpRequest](param);
+        }
+
+        applyReplaceMaps(param);
 
         // Count Test
         totalTest += 1;
