@@ -468,27 +468,18 @@ util.executeTest = (param) => {
                 } else {
                     console.log(">>> " + param.id + ". " + param.description + " <<< - Success.");
                 }
-                if (param.delay > 0) console.log(">>> Execution Delay(Milliseconds):::" + param.delay);
+                if (param.delay > 0) console.info(">>> Execution Delay(Milliseconds):::" + param.delay);
             }
         } else {
             if (param.debug) console.log();
             if (!param.debug) {
                 console.log(">>> " + param.id + ". " + param.description + " <<< - Start.");
                 console.log("\nURL:::");
-                //console.log(param.invokeUrl);
-                //console.log("\x1b[30m%s\x1b[0m", param.invokeUrl);
-                //console.log("\x1b[31m%s\x1b[0m", param.invokeUrl);
-                //console.log("\x1b[32m%s\x1b[0m", param.invokeUrl);
-                console.log("\x1b[33m%s\x1b[0m", param.invokeUrl);
-                //console.log("\x1b[34m%s\x1b[0m", param.invokeUrl);
-                //console.log("\x1b[35m%s\x1b[0m", param.invokeUrl);
-                //console.log("\x1b[36m%s\x1b[0m", param.invokeUrl);
-                //console.log("\x1b[37m%s\x1b[0m", param.invokeUrl);
-                //console.log("\x1b[38m%s\x1b[0m", param.invokeUrl);
+                console.warn(param.invokeUrl);
                 console.log();
             }
             //console.log(">>> " + param.id + ". " + param.description + " <<< - Failed. " + param.error.message);
-            console.log("%s \x1b[33m%s\x1b[0m", ">>> " + param.id + ". " + param.description + " <<< - Failed.", param.error.message);
+            console.log(">>> " + param.id + ". " + param.description + " <<< - Failed. " + setColor.info(param.error.message));
 
             if (param.error != undefined && param.error.response != undefined) {
                 console.log("   >>> statusCode::: " + param.error.response.statusCode);
@@ -524,6 +515,68 @@ function getElapseTime(startDate, ts) {
         message += "Elapse Time: " + (ts.totalHours()|0) + " hours " + ts.minutes + " minutes " + ts.seconds + " seconds " + ts.milliseconds + " milliseconds";
     }
     return message;
+}
+
+// add support to desplay console message with colors
+const colorSet = {
+    Reset: "\x1b[0m",
+    Bright: "\x1b[1m",
+    Dim: "\x1b[2m",
+    Underscore: "\x1b[4m",
+    Blink: "\x1b[5m",
+    Reverse: "\x1b[7m",
+    Hidden: "\x1b[8m",
+    fg: {
+     Black: "\x1b[30m",
+     Red: "\x1b[31m",
+     Green: "\x1b[32m",
+     Yellow: "\x1b[33m",
+     Blue: "\x1b[34m",
+     Magenta: "\x1b[35m",
+     Cyan: "\x1b[36m",
+     White: "\x1b[37m",
+     Crimson: "\x1b[38m"
+    },
+    bg: {
+     Black: "\x1b[40m",
+     Red: "\x1b[41m",
+     Green: "\x1b[42m",
+     Yellow: "\x1b[43m",
+     Blue: "\x1b[44m",
+     Magenta: "\x1b[45m",
+     Cyan: "\x1b[46m",
+     White: "\x1b[47m",
+     Crimson: "\x1b[48m"
+    }
+};
+var funcNames = ["log", "info", "warn", "error"];
+var colors = [colorSet.Reset, colorSet.fg.Green, colorSet.fg.Yellow, colorSet.fg.Red];
+
+// extende console function with color
+for (var i = 0; i < funcNames.length; i++) {
+    let funcName = funcNames[i];
+    let color = colors[i];
+    let oldFunc = console[funcName];
+    console[funcName] = function () {
+        var args = Array.prototype.slice.call(arguments);
+        if (args.length) args = [color + args[0]].concat(args.slice(1), colorSet.Reset);
+        oldFunc.apply(null, args);
+    };
+}
+
+var setColor = {}
+for (var i = 0; i < funcNames.length; i++) {
+    let funcName = funcNames[i];
+    let color = colors[i];
+
+    setColor[funcName] = function() {
+        var args = Array.prototype.slice.call(arguments);
+        if (args.length) {
+            args = [color + args[0]].concat(args.slice(1), colorSet.Reset);
+            return util.format.apply(null, args);
+        }
+        return "";
+    }
 }
 
 module.exports = {
