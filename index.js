@@ -369,6 +369,11 @@ function propagateDefaultValue(param) {
 
 util.executeTest = (param) => {
     return new promise(function(resolve, reject){
+        if (param.preHttpRequest != undefined) {
+            // execute pre Http Request function from parameters
+            util[param.preHttpRequest](param);
+        }
+
         // propagate default params
         propagateDefaultValue(param);
 
@@ -414,9 +419,9 @@ util.executeTest = (param) => {
             }
         }).finally( () => { return resolve() });
     }).then( () => { 
-        if (param.postInvoke != undefined) {
-            // execute postInvoke function from parameters
-            return util[param.postInvoke](param);
+        if (param.postHttpRequest != undefined) {
+            // execute post Http Request function from parameters
+            return util[param.postHttpRequest](param);
         }
     }).then( () => { 
         if (param.delay == undefined) {
@@ -440,8 +445,7 @@ util.executeTest = (param) => {
             if (param.signature != undefined) console.log('\nAuthorization Token::: \n' + param.signature);    
         
             console.log("\nURL:::");
-            //console.log(param.invokeUrl);
-            console.log("\x1b[33m%s\x1b[0m", param.invokeUrl);
+            console.warn(param.invokeUrl);
 
             if (param.responseBody != undefined || param.responseText != undefined) console.log("\nResponse:::");
             if (param.responseBody != undefined) console.log(JSON.stringify(param.responseBody, null, 4));
@@ -479,22 +483,22 @@ util.executeTest = (param) => {
                 console.log();
             }
             //console.log(">>> " + param.id + ". " + param.description + " <<< - Failed. " + param.error.message);
-            console.log(">>> " + param.id + ". " + param.description + " <<< - Failed. " + setColor.warn(param.error.message));
+            console.log(">>> " + param.id + ". " + param.description + " <<< - Failed. " + setColor.error(param.error.message));
 
             if (param.error != undefined && param.error.response != undefined) {
-                console.log("   >>> statusCode::: " + param.error.response.statusCode);
-                console.log("   >>> clientError::: " + param.error.response.clientError);
-                console.log("   >>> serverError::: " + param.error.response.serverError);
+                console.error("   >>> statusCode::: " + param.error.response.statusCode);
+                console.error("   >>> clientError::: " + param.error.response.clientError);
+                console.error("   >>> serverError::: " + param.error.response.serverError);
                 
                 if(param.debug) console.log(param.error);
 
                 console.log("=== errorText::: ===");
-                console.log(param.error.response.error.text);
+                console.error(param.error.response.error.text);
                 console.log("=== errorText::: ===");
             }
         }
         if (param.showElapseTime) console.log("\n" + getElapseTime(param.startTime, param.timespan));
-        if (param.debug) console.log(">>> " + param.id + ". " + param.description + " <<< - END.");
+        if (param.debug || param.error != undefined) console.log(">>> " + param.id + ". " + param.description + " <<< - END.");
     });    
 }
 
