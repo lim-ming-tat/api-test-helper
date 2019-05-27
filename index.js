@@ -564,6 +564,7 @@ for (var i = 0; i < funcNames.length; i++) {
     };
 }
 
+const utilx = require('util');
 var setColor = {}
 for (var i = 0; i < funcNames.length; i++) {
     let funcName = funcNames[i];
@@ -573,7 +574,7 @@ for (var i = 0; i < funcNames.length; i++) {
         var args = Array.prototype.slice.call(arguments);
         if (args.length) {
             args = [color + args[0]].concat(args.slice(1), colorSet.Reset);
-            return util.format.apply(null, args);
+            return utilx.format.apply(null, args);
         }
         return "";
     }
