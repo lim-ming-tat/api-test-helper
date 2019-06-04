@@ -357,16 +357,35 @@ function applyReplaceMaps(param) {
     // replace property value with value from sessionData
     if (param.replaceMaps != undefined) {
         param.replaceMaps.forEach(item => {
-            if (typeof _.get(param, item.propertyName) == "string") {
-                var replace = "{{" + item.replaceValue + "}}";
-                var regex = new RegExp(replace, "g");
+            // skipTest mapping has been perfrom during skipTestCheck, skip it here...
+            if (item.propertyName != "skipTest") {
+                if (typeof _.get(param, item.propertyName) == "string") {
+                    var replace = "{{" + item.replaceValue + "}}";
+                    var regex = new RegExp(replace, "g");
 
-                _.set(param, item.propertyName, _.get(param, item.propertyName).replace(regex, _.get(param, item.replaceValue)));
-            } else {
+                    _.set(param, item.propertyName, _.get(param, item.propertyName).replace(regex, _.get(param, item.replaceValue)));
+                } else {
+                    _.set(param, item.propertyName, _.get(param, item.replaceValue));
+                }
+            }
+        });
+    }
+}
+
+function skipTestCheck(param) {
+    // perform replace mapping for skipTest only, as it should be validated before the preHttpRequest processing
+    if (param.replaceMaps != undefined) {
+        param.replaceMaps.forEach(item => {
+            if (item.propertyName == "skipTest") {
                 _.set(param, item.propertyName, _.get(param, item.replaceValue));
             }
         });
     }
+
+    if (param.skipTest != undefined && param.skipTest)
+        return true;
+    else
+        return false;
 }
 
 util.executeTest = (param) => {
@@ -374,7 +393,7 @@ util.executeTest = (param) => {
         // propagate default params
         propagateDefaultValue(param);
 
-        if (param.skipTest != undefined && param.skipTest) {
+        if (skipTestCheck(param)) {
             return resolve();
         }
 
