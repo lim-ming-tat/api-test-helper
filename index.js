@@ -78,8 +78,22 @@ util.invokeRequest = (param) => {
         if ((param.httpMethod == "POST" || param.httpMethod == "PUT") && param.textData != undefined) {
             let postData = param.textData.data
 
-            if (param.textData.dataFileName != undefined)
+            if (param.textData.dataFileName != undefined) {
                 postData = fs.readFileSync(param.textData.dataFileName, "utf8")
+
+                //console.log(JSON.stringify(param, null, 4));
+                if (param.textData.replaceMapper != undefined) {
+                    var jsonData = JSON.stringify(postData);
+            
+                    for (let key in param.textData.replaceMapper) {
+                        var replace = "{{" + key + "}}";
+                        var regex = new RegExp(replace, "g");
+            
+                        jsonData = jsonData.replace(regex, _.get(param, _.get(param.textData.replaceMapper, key)));
+                    }
+                    postData = JSON.parse(jsonData)
+                }
+            }
 
             req = req.type(param.textData.contentType).send(postData);
         }
