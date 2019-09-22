@@ -10,7 +10,9 @@ const { URL } = require('url');
 const _ = require("lodash");
 
 const apex = require('node-apex-api-security').ApiSigningUtil;
-const dateFormat = require('./timestamp').dateFormat;
+
+//const dateFormat = require('./timestamp').dateFormat;
+const { DateTime } = require("luxon");
 
 var totalTest = 0;
 var passedTest = 0;
@@ -138,13 +140,16 @@ util.invokeRequest = (param) => {
             req = req.type("multipart/form-data");
         }
 
-        param.startTime = new Date();
+        //param.startTime = new Date();
+        param.startTime = DateTime.local();
         req.then(function(res) {
-            param.timespan = param.startTime.timespan();
+            //param.timespan = param.startTime.timespan();
+            param.endTime = DateTime.local();
             resolve(res);
         })
         .catch(function(err) {
-            param.timespan = param.startTime.timespan();
+            //param.timespan = param.startTime.timespan();
+            param.endTime = DateTime.local();
             reject(err);
         });
     });
@@ -254,16 +259,18 @@ util.displayTestResult = () => {
 
 var startDate;
 util.startTestTimer = () => {
-    startDate = new Date();
+    //startDate = new Date();
+    startDate = DateTime.local();
     return Promise.resolve();
 }
 
 util.displayElapseTime = () => {
     if (startDate == undefined) return Promise.resolve("Start timer not started!");
 
-    var ts = startDate.timespan();
+    //var ts = startDate.timespan();
 
-    var message = getElapseTime(startDate, ts);
+    //var message = getElapseTime(startDate, ts);
+    var message = getElapseTime(startDate);
 
     return Promise.resolve(message);
 }
@@ -534,11 +541,12 @@ util.executeTest = (param) => {
                 console.log("=== errorText::: ===");
             }
         }
-        if (param.showElapseTime) console.log("\n" + getElapseTime(param.startTime, param.timespan));
+        //if (param.showElapseTime) console.log("\n" + getElapseTime(param.startTime, param.timespan));
+        if (param.showElapseTime) console.log("\n" + getElapseTime(param.startTime, param.endTime));
         if (param.debug || param.error != undefined) console.log(">>> " + param.id + ". " + param.description + " <<< - END.");
     });    
 }
-
+/*
 function getElapseTime(startDate, ts) {
     var message = "";
     if (startDate == undefined || ts == undefined) return message;
@@ -555,6 +563,49 @@ function getElapseTime(startDate, ts) {
     } else {
         message += "Elapse Time: " + (ts.totalHours()|0) + " hours " + ts.minutes + " minutes " + ts.seconds + " seconds " + ts.milliseconds + " milliseconds";
     }
+    return message;
+}
+*/
+function getElapseTime(startTime, endTime, dateFormat) {
+    const DATE_FORMAT = "yyyy-MM-dd TT.SSS"
+
+    var stat = {}
+    var message = "";
+
+    if (startTime == undefined) return message;
+    if (endTime == undefined) endTime = DateTime.local();
+    if (dateFormat == undefined) dateFormat = DATE_FORMAT;
+
+    message += " Start Time: " + startTime.toFormat(DATE_FORMAT) + "\n";
+    message += "   End Time: " + endTime.toFormat(DATE_FORMAT) + "\n";
+    stat.startTime = startTime.toFormat(DATE_FORMAT);
+    stat.endTime = endTime.toFormat(DATE_FORMAT);
+
+    var timeSpan = endTime.diff(startTime, ['days', 'hours', 'minutes', 'seconds', 'milliseconds'])
+
+    var elapseTime = ""
+    if ((timeSpan.days|0) > 0) {
+        elapseTime += timeSpan.days + " days ";
+    }
+
+    if ((timeSpan.hours|0) > 0) {
+        elapseTime += timeSpan.hours + " hours ";
+    }
+
+    if ((timeSpan.minutes|0) > 0) {
+        elapseTime += timeSpan.minutes + " minutes ";
+    }
+
+    if ((timeSpan.seconds|0) > 0) {
+        elapseTime += timeSpan.seconds + " seconds ";
+    }
+
+    if ((timeSpan.milliseconds|0) > 0) {
+        elapseTime += timeSpan.milliseconds + " milliseconds";
+    }
+    stat.elapseTime = elapseTime;
+    message += "Elapse Time: " + elapseTime;
+
     return message;
 }
 

@@ -1,3 +1,4 @@
+/*
 const timespan = require('timespan');
 
 var dateFormat = function () {
@@ -126,3 +127,4 @@ Date.prototype.timespan = function (endDate) {
 module.exports = {
     dateFormat : dateFormat
 };
+*/
